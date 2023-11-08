@@ -1,5 +1,9 @@
 from socket import *
+<<<<<<< HEAD
 serverPort = 10000
+=======
+serverPort = 9000
+>>>>>>> hotfix
 serverSocket = socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('127.0.0.1',serverPort))
 serverSocket.listen(1)
