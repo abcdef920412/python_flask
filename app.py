@@ -19,11 +19,15 @@ def index():
 @app.route("/sign")
 def sign():
    return render_template("signup.html")
-
+   
 @app.route("/member")
 def  member():
     if "username" in session:
-     return render_template("member.html")
+     if "username" == "admin520":
+      return render_template("admin.html")
+     else:
+      name=session["username"]
+      return render_template("member.html",username=name)
     else :
      return redirect("/")
 @app.route("/error")
@@ -37,6 +41,8 @@ def signup():
     password=request.form["password"]
     comfirm_password=request.form["comfirm_password"]
     #資料庫互動
+    if comfirm_password!=password :
+       return redirect("/error")
     collection=db["users"]
     result=collection.find_one({ 
         "username": username
@@ -47,7 +53,6 @@ def signup():
         "fullname":fullname,
         "username": username,
         "password":password,
-        "comfirm_password":comfirm_password
     })
     return redirect("/")
 
