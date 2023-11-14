@@ -26,8 +26,13 @@ def  member():
      if "username" == "admin520":
       return render_template("admin.html")
      else:
+      collection=db["events"]
       name=session["username"]
-      return render_template("member.html",username=name)
+      cursor=collection.find()
+      event=[]
+      for doc in cursor:
+         event.append(doc["title"])
+      return render_template("member.html",username=name,title=event)
     else :
      return redirect("/")
 @app.route("/error")
@@ -78,4 +83,22 @@ def signout():
    del session["username"]
    return redirect("/")
 
+@app.route("/create")
+def create():
+   return render_template("create_event.html")
+
+@app.route("/create_event",methods=["POST"])
+def create_event():
+   title=request.form["title"]
+   date=request.form["date"]
+   location=request.form["location"]
+   description=request.form["description"]
+   collection=db["events"]
+   collection.insert({
+      "title":title,
+      "date":date,
+      "location":location,
+      "description":description,
+   })
+   return redirect("/create")
 app.run(port=3000)

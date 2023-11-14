@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="123.css">
+  <link rel="stylesheet" href="member.css">
   <title>Flexbox Layout</title>
 </head>
 <body>
@@ -11,13 +11,18 @@
   <div class="container">
     <div class="header">{{username}}
       <img src="head.png" width="30" height="30">
+      <div><a href="/signout">登出</a></div>
     </div>
     <div class="row">
       <div class="column">
         <div>烤肉</div>
         <div>宿營</div>
       </div>
-      <div class="column">Container 2</div>
+      <div class="column">
+            {% for title in title %}
+              <div>{{title}}</div>
+            {% endfor %}
+      </div>
       <div class="column">Container 3</div>
     </div>
   </div>
