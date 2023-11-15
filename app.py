@@ -94,7 +94,7 @@ def create_event():
    location=request.form["location"]
    description=request.form["description"]
    collection=db["events"]
-   collection.insert({
+   collection.insert_one({
       "title":title,
       "date":date,
       "location":location,
