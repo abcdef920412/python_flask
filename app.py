@@ -102,6 +102,20 @@ def create_event():
    })
    return redirect("/create")
 
-
+@app.route("/search_event", methods = ["POST"])
+def search_event():
+    event_name = request.form["q"]
+    collection = db["events"]
+    result = collection.find_one({
+        "title": { "$regex": event_name }
+    })
+    if result == None:
+        return redirect("/error")
+    result = collection.find({
+        "title": { "$regex": event_name }
+    })
+    for doc in result:
+        print(doc)
+    return redirect("/create")
 
 app.run(port = 3000)

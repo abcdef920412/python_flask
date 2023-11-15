@@ -24,9 +24,11 @@
             {% endfor %}
       </div>
       <div class="column">
-		<label for="site-search">Search the site:</label>
-        <input type="search" id="site-search" name="q" />
-        <button>Search</button>
+        <form action="/search_event" method="POST">
+          <label for="site-search">Search the site:</label>
+          <input type="search" id="site-search" name="q" />
+          <input type="submit" value = "搜尋" />
+        </form>
 	  </div>
     </div>
   </div>
