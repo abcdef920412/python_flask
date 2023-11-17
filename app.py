@@ -3,14 +3,14 @@ import pymongo
 uri = "mongodb+srv://root:root920412@cluster0.lvs2gvu.mongodb.net/?retryWrites=true&w=majority"
 client = pymongo.MongoClient(uri)
 
-db=client.member_system
+db = client.member_system
 
-app=Flask(
+app = Flask(
     __name__,
-    static_folder="static",
-    static_url_path='/'
+    static_folder = "static",
+    static_url_path = '/'
 )
-app.secret_key="any"
+app.secret_key = "any"
 
 @app.route("/")
 def index():
@@ -21,38 +21,38 @@ def sign():
    return render_template("signup.html")
    
 @app.route("/member")
-def  member():
+def member():
     if "username" in session:
-     if "username" == "admin520":
-      return render_template("admin.html")
-     else:
-      collection=db["events"]
-      name=session["username"]
-      cursor=collection.find()
-      event=[]
-      for doc in cursor:
-         event.append(doc["title"])
-      return render_template("member.html",username=name,title=event)
+        if "username" == "admin520":
+            return render_template("admin.html")
+        else:
+            collection = db["events"]
+            name = session["username"]
+            cursor = collection.find()
+            event = []
+            for doc in cursor:
+                event.append(doc["title"])
+            return render_template("member.html", username = name, title = event)
     else :
-     return redirect("/")
+        return redirect("/")
 @app.route("/error")
 def error():
     return render_template("error.html")
 
-@app.route("/signup",methods=["POST"])
+@app.route("/signup", methods = ["POST"])
 def signup():
-    fullname=request.form["fullname"]
-    username=request.form["username"]
-    password=request.form["password"]
-    comfirm_password=request.form["comfirm_password"]
+    fullname = request.form["fullname"]
+    username = request.form["username"]
+    password = request.form["password"]
+    comfirm_password = request.form["comfirm_password"]
     #資料庫互動
-    if comfirm_password!=password :
+    if comfirm_password != password :
        return redirect("/error")
-    collection=db["users"]
-    result=collection.find_one({ 
+    collection = db["users"]
+    result = collection.find_one({ 
         "username": username
     })
-    if result !=None:
+    if result != None:
         return redirect("/error")
     collection.insert_one({
         "fullname":fullname,
@@ -61,21 +61,21 @@ def signup():
     })
     return redirect("/")
 
-@app.route("/signin",methods=["POST"])
+@app.route("/signin",methods = ["POST"])
 def signin():
-    username=request.form["username"]
-    password=request.form["password"]
+    username = request.form["username"]
+    password = request.form["password"]
     #資料庫互動
-    collection=db["users"]
-    result=collection.find_one({
+    collection = db["users"]
+    result = collection.find_one({
         "$and" :[
             {"username":username, 
              "password":password}
         ]
     })
-    if result ==None:
+    if result == None:
         return redirect("/error")
-    session["username"]=result["username"]
+    session["username"] = result["username"]
     return redirect("/member")
 
 @app.route("/signout")
@@ -89,16 +89,33 @@ def create():
 
 @app.route("/create_event",methods=["POST"])
 def create_event():
-   title=request.form["title"]
-   date=request.form["date"]
-   location=request.form["location"]
-   description=request.form["description"]
-   collection=db["events"]
-   collection.insert({
+   title = request.form["title"]
+   date = request.form["date"]
+   location = request.form["location"]
+   description = request.form["description"]
+   collection = db["events"]
+   collection.insert_one({
       "title":title,
       "date":date,
       "location":location,
       "description":description,
    })
    return redirect("/create")
-app.run(port=3000)
+
+@app.route("/search_event", methods = ["POST"])
+def search_event():
+    event_name = request.form["q"]
+    collection = db["events"]
+    result = collection.find_one({
+        "title": { "$regex": event_name }
+    })
+    if result == None:
+        return redirect("/error")
+    result = collection.find({
+        "title": { "$regex": event_name }
+    })
+    for doc in result:
+        print(doc)
+    return redirect("/create")
+
+app.run(port = 3000)
