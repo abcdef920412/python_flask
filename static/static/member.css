@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* 100% 視窗高度 */
+  }
+  
+  .header {
+    background-color: rgb(48, 50, 58); /* 綠色背景，可自行調整顏色 */
+    color: white;
+    padding: 8px;
+  }
+  
+  .row {
+    display: flex;
+    justify-content: space-between; /* 將內容平均分布在行中 */
+    flex: 1; /* 充滿剩餘的高度 */
+  }
+  
+  .column {
+    flex: 1; /* 充滿剩餘的寬度 */
+    padding: 1em;
+    border: 1px solid #ddd; /* 加入邊框效果，可根據需要自行調整 */
+    box-sizing: border-box; /* 避免邊框影響寬度和高度計算 */
+  }
