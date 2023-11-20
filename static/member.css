@@ -27,3 +27,10 @@ body {
     border: 1px solid #ddd; /* 加入邊框效果，可根據需要自行調整 */
     box-sizing: border-box; /* 避免邊框影響寬度和高度計算 */
   }
+
+  .header a{
+    text-decoration: none;
+    float:right;
+    padding-top: 8px;
+    color:white;
+  }

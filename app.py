@@ -23,9 +23,6 @@ def sign():
 @app.route("/member")
 def member():
     if "username" in session:
-        if "username" == "admin520":
-            return render_template("admin.html")
-        else:
             collection = db["events"]
             name = session["username"]
             cursor = collection.find()
@@ -37,7 +34,8 @@ def member():
         return redirect("/")
 @app.route("/error")
 def error():
-    return render_template("error.html")
+    message=request.args.get("msg" , "發生錯誤")
+    return render_template("error.html",message=message)
 
 @app.route("/signup", methods = ["POST"])
 def signup():
@@ -47,17 +45,19 @@ def signup():
     comfirm_password = request.form["comfirm_password"]
     #資料庫互動
     if comfirm_password != password :
-       return redirect("/error")
+       return redirect("/error?msg=確認密碼與密碼不符")
     collection = db["users"]
-    result = collection.find_one({ 
-        "username": username
-    })
-    if result != None:
-        return redirect("/error")
+    # result = collection.find_one({ 
+    #     "username": username
+    # })
+    # if result != None:
+    #     return redirect("/error")
     collection.insert_one({
         "fullname":fullname,
         "username": username,
         "password":password,
+        "level":"使用者",
+        "identity":"老師"
     })
     return redirect("/")
 
@@ -74,7 +74,7 @@ def signin():
         ]
     })
     if result == None:
-        return redirect("/error")
+        return redirect("/error?msg=帳號密碼輸入錯誤")
     session["username"] = result["username"]
     return redirect("/member")
 
