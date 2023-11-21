@@ -1,4 +1,5 @@
 from flask import*
+from bson import ObjectId
 from datetime import datetime
 import pymongo 
 uri = "mongodb+srv://root:root920412@cluster0.lvs2gvu.mongodb.net/?retryWrites=true&w=majority"
@@ -28,11 +29,32 @@ def member():
             name = session["username"]
             cursor = collection.find()
             event = []
+            event_id = []
+            num = 0
             for doc in cursor:
                 event.append(doc["title"])
-            return render_template("home.html", username = name, title = event)
+                event_id.append(str(doc["_id"]))
+                num += 1
+            return render_template("home.html", username = name, title = event, _id = event_id, num = num)
     else :
         return redirect("/")
+    
+@app.route("/event<event_id>")
+def event(event_id):
+    #print(event_id)
+    collection = db["events"]
+    item =  collection.find_one({
+        "_id" : ObjectId(event_id) 
+    })
+    if item == None:
+        return redirect("/error")
+    title = item["title"]
+    date_begin = item["date_begin"]
+    date_end = item["date_end"]
+    location = item["location"]
+    description = item["description"]
+    return render_template("event.html", event_title = title, date_begin = date_begin, date_end=date_end , event_location = location, event_description = description)
+    
 @app.route("/error")
 def error():
     message=request.args.get("msg" , "發生錯誤")
@@ -114,7 +136,7 @@ def create_event():
         #"tag":tag,
         #"requirement":requirement,
     })
-    return redirect("/create")
+    return redirect("/member")
 
 @app.route("/search_event", methods = ["POST"])
 def search_event():
@@ -126,13 +148,17 @@ def search_event():
     })
     if result == None:
         return redirect("/error?msg=找不到此活動")
+    num=0
     result = collection.find({
         "title": { "$regex": event_name }
     })
     event = []
+    event_id= []
     for doc in result:
+        num+=1
+        event_id.append(str(doc["_id"]))
         event.append(doc["title"])
-    return render_template("home.html", username = name, title = event)
+    return render_template("home.html", username = name, title = event, num = num , _id = event_id)
 
 @app.route("/delete_event", methods = ["DELETE"])
 def delete_event():
