@@ -1,4 +1,5 @@
 from flask import*
+from datetime import datetime
 import pymongo 
 uri = "mongodb+srv://root:root920412@cluster0.lvs2gvu.mongodb.net/?retryWrites=true&w=majority"
 client = pymongo.MongoClient(uri)
@@ -14,7 +15,7 @@ app.secret_key = "any"
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("signin.html")
 
 @app.route("/sign")
 def sign():
@@ -32,7 +33,7 @@ def member():
             event = []
             for doc in cursor:
                 event.append(doc["title"])
-            return render_template("member.html", username = name, title = event)
+            return render_template("home.html", username = name, title = event)
     else :
         return redirect("/")
 @app.route("/error")
@@ -44,6 +45,7 @@ def signup():
     fullname = request.form["fullname"]
     username = request.form["username"]
     password = request.form["password"]
+    identity = request.form["identity"]
     comfirm_password = request.form["comfirm_password"]
     #資料庫互動
     if comfirm_password != password :
@@ -58,6 +60,8 @@ def signup():
         "fullname":fullname,
         "username": username,
         "password":password,
+        "identity":identity,
+        "level":"normal",
     })
     return redirect("/")
 
@@ -89,21 +93,33 @@ def create():
 
 @app.route("/create_event",methods=["POST"])
 def create_event():
-   title = request.form["title"]
-   date = request.form["date"]
-   location = request.form["location"]
-   description = request.form["description"]
-   collection = db["events"]
-   collection.insert_one({
-      "title":title,
-      "date":date,
-      "location":location,
-      "description":description,
-   })
-   return redirect("/create")
+    title = request.form["title"]
+    date_begin = request.form["date_begin"]
+    date_end = request.form["date_end"]
+    location = request.form["location"]
+    description = request.form["description"]
+    collection = db["users"]
+    host = session["username"]
+    #member = request.form["member"]
+    #tag = request.form["tag"]
+    #requirement = request.form["requirement"]
+    collection = db["events"]
+    collection.insert_one({
+        "title":title,
+        "date_begin":date_begin,
+        "date_end":date_end,
+        "location":location,
+        "description":description,
+        "host":host,
+        #"member":member,#好像沒辦法插入NULL
+        #"tag":tag,
+        #"requirement":requirement,
+    })
+    return redirect("/create")
 
 @app.route("/search_event", methods = ["POST"])
 def search_event():
+    name = session["username"]
     event_name = request.form["q"]
     collection = db["events"]
     result = collection.find_one({
@@ -114,8 +130,87 @@ def search_event():
     result = collection.find({
         "title": { "$regex": event_name }
     })
+    event = []
     for doc in result:
-        print(doc)
-    return redirect("/create")
+        event.append(doc["title"])
+    return render_template("home.html", username = name, title = event)
+
+@app.route("/delete_event", methods = ["DELETE"])
+def delete_event():
+    delete_name = request.form["?????????????????"]
+    collection = db["events"]
+    collection.delete_many({
+        "title" : delete_name
+    })
+
+@app.route("/attend_event")#自己有報名的活動
+def attend_event():
+    if "username" in session:
+        collection = db["events"]
+        name = session["username"]
+        result = collection.find({#找出成員內有此user的活動
+            "member" : name
+        })
+        event = []
+        for doc in result:
+            event.append(doc["title"])
+        return render_template("home.html", username = name, title = event)
+    else :
+        return redirect("/error")
+
+@app.route("/my_event")#自己創的活動
+def my_event():
+    if "username" in session:
+        collection = db["events"]
+        name = session["username"]
+        result = collection.find({#找出主辦人有此user的活動
+            "host" : name
+        })
+        event = []
+        for doc in result:
+            event.append(doc["title"])
+        return render_template("home.html", username = name, title = event)
+    else :
+        return redirect("/error")
+    
+@app.route("/end_event")#自己有參加(報名)且已結束的活動
+def end_event():
+    if "username" in session:
+        collection = db["events"]
+        name = session["username"]
+        rightnow = datetime.now()#有import
+        result = collection.find({#找出成員或主持內有此user且已過期的活動
+            "$and" :[{
+                {"date" : {"$lte" : rightnow}},
+                {"$or" : [
+                    {"member" : name},
+                    {"host" : name}
+                ]}
+            }]
+        })
+        event = []
+        for doc in result:
+            event.append(doc["title"])
+        return render_template("home.html", username = name, title = event)
+    else :
+        return redirect("/error")
+
+"""@app.route("/permission")
+def permission_adjust():
+    command = request.form["command"]
+    collection = db["users"]
+    if command == "加入黑名單":
+
+        for name in username:
+            collection.find({
+                "username":username,
+            })
+    elif command == "移除黑名單":
+
+    elif command == "設定為進階使用者":
+
+    elif command == "設定為一般使用者":
+
+    return render_template("userdata.html")"""
 
 app.run(port = 3000)
