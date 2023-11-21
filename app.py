@@ -24,9 +24,6 @@ def sign():
 @app.route("/member")
 def member():
     if "username" in session:
-        if "username" == "admin520":
-            return render_template("admin.html")
-        else:
             collection = db["events"]
             name = session["username"]
             cursor = collection.find()
@@ -38,7 +35,8 @@ def member():
         return redirect("/")
 @app.route("/error")
 def error():
-    return render_template("error.html")
+    message=request.args.get("msg" , "發生錯誤")
+    return render_template("error.html",message=message)
 
 @app.route("/signup", methods = ["POST"])
 def signup():
@@ -47,15 +45,16 @@ def signup():
     password = request.form["password"]
     identity = request.form["identity"]
     comfirm_password = request.form["comfirm_password"]
+    identity=request.form["identity"]
     #資料庫互動
     if comfirm_password != password :
-       return redirect("/error")
+       return redirect("/error?msg=確認密碼與密碼不符")
     collection = db["users"]
     result = collection.find_one({ 
         "username": username
     })
     if result != None:
-        return redirect("/error")
+        return redirect("/error?msg=帳號已被註冊過，請嘗試別的帳號")
     collection.insert_one({
         "fullname":fullname,
         "username": username,
@@ -78,7 +77,7 @@ def signin():
         ]
     })
     if result == None:
-        return redirect("/error")
+        return redirect("/error?msg=帳號密碼輸入錯誤")
     session["username"] = result["username"]
     return redirect("/member")
 
@@ -126,7 +125,7 @@ def search_event():
         "title": { "$regex": event_name }
     })
     if result == None:
-        return redirect("/error")
+        return redirect("/error?msg=找不到此活動")
     result = collection.find({
         "title": { "$regex": event_name }
     })
