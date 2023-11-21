@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="home.css">
-  <title>Flexbox Layout</title>
+  <link rel="stylesheet" href="member.css">
+  <title>活動輕鬆報名</title>
 </head>
 <body>
 
@@ -15,17 +15,18 @@
     </div>
     <div class="row">
       <div class="column">
-        <div><a href="/member">烤肉</a></div><!-- 目前超連結連回member頁面 -->
-        <div>宿營</div>
+        <!--<div><a href="/member">已報名的活動</a></div> 目前超連結連回member頁面 -->
+        <!--<div><a href="/member">已結束的活動</a></div> 目前超連結連回member頁面 -->
+        <!--<div><a href="/member">已創建的活動</a></div> 只有進階使用者和系統管理員能看到的選項 -->
       </div>
       <div class="column">
             {% for title in title %}
-              <div>{{title}}</div>
+              <div><li>{{title}}</li></div>
             {% endfor %}
       </div>
       <div class="column">
         <form action="/search_event" method="POST">
-          <label for="site-search">Search the site:</label>
+          <label for="site-search">搜尋活動：</label>
           <input type="search" id="site-search" name="q" />
           <input type="submit" value = "搜尋" />
         </form>
