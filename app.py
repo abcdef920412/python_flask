@@ -14,7 +14,7 @@ app.secret_key = "any"
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("signin.html")
 
 @app.route("/sign")
 def sign():
@@ -29,7 +29,7 @@ def member():
             event = []
             for doc in cursor:
                 event.append(doc["title"])
-            return render_template("member.html", username = name, title = event)
+            return render_template("home.html", username = name, title = event)
     else :
         return redirect("/")
 @app.route("/error")
@@ -43,21 +43,22 @@ def signup():
     username = request.form["username"]
     password = request.form["password"]
     comfirm_password = request.form["comfirm_password"]
+    identity=request.form["identity"]
     #資料庫互動
     if comfirm_password != password :
        return redirect("/error?msg=確認密碼與密碼不符")
     collection = db["users"]
-    # result = collection.find_one({ 
-    #     "username": username
-    # })
-    # if result != None:
-    #     return redirect("/error")
+    result = collection.find_one({ 
+        "username": username
+    })
+    if result != None:
+        return redirect("/error?msg=帳號已被註冊過，請嘗試別的帳號")
     collection.insert_one({
         "fullname":fullname,
         "username": username,
         "password":password,
-        "level":"使用者",
-        "identity":"老師"
+        "level":"normal",
+        "identity":identity
     })
     return redirect("/")
 
@@ -110,7 +111,7 @@ def search_event():
         "title": { "$regex": event_name }
     })
     if result == None:
-        return redirect("/error")
+        return redirect("/error?msg=找不到此活動")
     result = collection.find({
         "title": { "$regex": event_name }
     })
