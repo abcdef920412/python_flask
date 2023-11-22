@@ -24,13 +24,13 @@ def sign():
 @app.route("/member")
 def member():
     if "username" in session:
-            collection = db["events"]
-            name = session["username"]
-            cursor = collection.find()
-            event = []
-            for doc in cursor:
-                event.append(doc["title"])
-            return render_template("home.html", username = name, title = event)
+        collection = db["events"]
+        name = session["username"]
+        cursor = collection.find()
+        event = []
+        for doc in cursor:
+            event.append(doc["title"])
+        return render_template("home.html", username = name, title = event)
     else :
         return redirect("/")
 @app.route("/error")
