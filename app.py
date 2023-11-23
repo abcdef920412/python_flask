@@ -39,7 +39,7 @@ def member():
     else :
         return redirect("/")
     
-@app.route("/event<event_id>")
+@app.route("/event/<event_id>")
 def event(event_id):
     #print(event_id)
     collection = db["events"]
@@ -53,8 +53,27 @@ def event(event_id):
     date_end = item["date_end"]
     location = item["location"]
     description = item["description"]
-    return render_template("event.html", event_title = title, date_begin = date_begin, date_end=date_end , event_location = location, event_description = description)
-    
+    return render_template("event.html",event_id = event_id, event_title = title, date_begin = date_begin, date_end = date_end , event_location = location, event_description = description)
+
+@app.route("/register_event/<event_id>")
+def register_event(event_id):
+    if "username" in session:
+        member = session["username"]
+        collection = db["events"]
+        filter = {"_id": ObjectId(event_id)}
+        isRegistered = collection.find_one({
+            "_id" : ObjectId(event_id),
+            "member" : member
+        })
+        if isRegistered == None:
+            newvalue = {"$set": {"member": member}}
+            collection.update_one(filter, newvalue)
+            return {'result' : 'Success'}
+
+        return {'result' : 'isRegistered'}
+    else:
+        return redirect("/error")
+
 @app.route("/error")
 def error():
     message=request.args.get("msg" , "發生錯誤")
@@ -148,25 +167,34 @@ def search_event():
     })
     if result == None:
         return redirect("/error?msg=找不到此活動")
-    num=0
+    num = 0
     result = collection.find({
         "title": { "$regex": event_name }
     })
     event = []
     event_id= []
     for doc in result:
-        num+=1
+        num += 1
         event_id.append(str(doc["_id"]))
         event.append(doc["title"])
     return render_template("home.html", username = name, title = event, num = num , _id = event_id)
 
-@app.route("/delete_event", methods = ["DELETE"])
-def delete_event():
-    delete_name = request.form["?????????????????"]
-    collection = db["events"]
-    collection.delete_many({
-        "title" : delete_name
-    })
+@app.route("/delete_event/<event_id>")
+def delete_event(event_id):
+    if "username" in session:
+        collection = db["events"]
+        target = collection.find_one({
+            "_id" : ObjectId(event_id) 
+        })
+        print("target")
+        if target != None:
+            collection.delete_one({
+                "_id" : ObjectId(event_id) 
+            })
+            return {'result' : 'Success'}
+        return {'result' : 'Notfind'}
+    else :
+        return redirect("/error")
 
 @app.route("/attend_event")#自己有報名的活動
 def attend_event():
@@ -219,6 +247,8 @@ def end_event():
         return render_template("home.html", username = name, title = event)
     else :
         return redirect("/error")
+
+# ... （其他代码）
 
 """@app.route("/permission")
 def permission_adjust():
