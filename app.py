@@ -179,7 +179,7 @@ def search_event():
         event.append(doc["title"])
     return render_template("home.html", username = name, title = event, num = num , _id = event_id)
 
-@app.route("/delete_event/<event_id>", methods = ["POST"])
+@app.route("/delete_event/<event_id>")
 def delete_event(event_id):
     if "username" in session:
         collection = db["events"]
@@ -191,8 +191,7 @@ def delete_event(event_id):
                 "_id" : ObjectId(event_id) 
             })
             return jsonify( result = 'Success')
-
-        return jsonify( result = 'NotFound')
+        return jsonify( result = 'Notfind')
     else :
         return redirect("/error")
 

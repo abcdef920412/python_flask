@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <title>查看活動</title>
@@ -17,6 +16,7 @@
         .container{
             width:35em;
             margin-top: 30px;
+            font-family: 'Noto Sans TC', sans-serif;
         }
         .section1{
             box-shadow: 0 0px 100px rgba(41, 39, 39, 0.103);
@@ -25,11 +25,11 @@
             padding-right: 40px;
             padding-bottom: 70px;
         }
-        h3{
+        h2{
             border-color: black;
             text-align: center;
             justify-content: center;
-            font-family: 'Noto Sans TC', sans-serif;
+            
         }
         .container button{
             float: right;
@@ -38,6 +38,7 @@
             border: none;
         }
 
+
         #deletion {
             margin-right: 15px;
         }
@@ -45,17 +46,17 @@
 
     <div class="container">
         <div class="section1">
-            <h3>查看活動</h3>
-            <label for="title" class="form-label">活動標題:</label><br>
+            <h2>查看活動</h2>
+            <h5 id="title" class="form-label">活動標題:</h5>
             <p>{{event_title}}</p>
-            <label for="date" class="form-label">活動日期(begin):</label>
+            <h5 id="date_begin" class="form-label">活動開始日期:</h5>
             <p>{{date_begin}}</p>
-            <label for="date" class="form-label">活動日期(end):</label><br>
+            <h5 id="date_end" class="form-label">活動結束日期:</h5>
             <p>{{date_end}}</p>
-            <label for="location" class="form-label">活動地點:</label><br>
+            <h5 id="event_location" class="form-label">活動地點:</h5>
             <p>{{event_location}}</p>
-            <label for="description" class="form-label" >活動介紹:</label><br>
-            <p>{{event_description}}</p><br>
+            <h5 id="event_description" class="form-label" >活動介紹:</h5>
+            <p>{{event_description}}</p>
             <button id="registration" class="btn btn-primary">報名</button>
             <button id="deletion" class="btn btn-primary">刪除</button>
         </div>
@@ -64,8 +65,8 @@
         var registrationButton = document.getElementById('registration');
         registrationButton.addEventListener('click', function () {  
             // 使用 Fetch API 發起 AJAX 請求
-            const user_url = {{ url_for("register_event", event_id = event_id)|tojson }}
-            fetch(user_url)
+            const register_url = {{ url_for("register_event", event_id = event_id)|tojson }}
+            fetch(register_url)
             .then(response => response.json())
             .then(data => {
                 if (data.result == 'Success') {
@@ -97,9 +98,9 @@
         var deleteButton = document.getElementById('deletion');
         deleteButton.addEventListener('click', function () {  
             // 使用 Fetch API 發起 AJAX 請求
-            const user_url = {{ url_for("delete_event", event_id = event_id)|tojson }}
-            fetch(user_url)
-            .then(response => response.json())
+            const delete_url = {{ url_for("delete_event", event_id = event_id)|tojson }}
+            fetch(delete_url)
+            .then(response => response.text())
             .then(data => {
                 if (data.result == 'Success') {
                     Swal.fire({
@@ -130,3 +131,4 @@
     </script>
 </body>
 </html>
+
