@@ -68,9 +68,9 @@ def register_event(event_id):
         if isRegistered == None:
             newvalue = {"$set": {"member": member}}
             collection.update_one(filter, newvalue)
-            return jsonify( result = 'Success')
+            return {'result' : 'Success'}
 
-        return jsonify( result = 'isRegistered')
+        return {'result' : 'isRegistered'}
     else:
         return redirect("/error")
 
@@ -186,12 +186,13 @@ def delete_event(event_id):
         target = collection.find_one({
             "_id" : ObjectId(event_id) 
         })
+        print("target")
         if target != None:
             collection.delete_one({
                 "_id" : ObjectId(event_id) 
             })
-            return jsonify( result = 'Success')
-        return jsonify( result = 'Notfind')
+            return {'result' : 'Success'}
+        return {'result' : 'Notfind'}
     else :
         return redirect("/error")
 

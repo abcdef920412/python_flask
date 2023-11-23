@@ -100,7 +100,7 @@
             // 使用 Fetch API 發起 AJAX 請求
             const delete_url = {{ url_for("delete_event", event_id = event_id)|tojson }}
             fetch(delete_url)
-            .then(response => response.text())
+            .then(response => response.json())
             .then(data => {
                 if (data.result == 'Success') {
                     Swal.fire({
