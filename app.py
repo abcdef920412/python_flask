@@ -182,7 +182,6 @@ def search_event():
 @app.route("/delete_event/<event_id>", methods = ["POST"])
 def delete_event(event_id):
     if "username" in session:
-        print("XD")
         collection = db["events"]
         target = collection.find_one({
             "_id" : ObjectId(event_id) 
