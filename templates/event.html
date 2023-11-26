@@ -57,6 +57,10 @@
             <p>{{event_location}}</p>
             <h5 id="event_description" class="form-label" >活動介紹:</h5>
             <p>{{event_description}}</p>
+            <h5 id="event_description" class="form-label" >人數限制:</h5>
+            <p>{{limit_value}}</p>
+            <h5 id="event_description" class="form-label" >尚餘名額:</h5>
+            <p>{{limit_value - registered_count}}</p>
             <button id="registration" class="btn btn-primary">報名</button>
             <button id="deletion" class="btn btn-primary">刪除</button>
         </div>
@@ -77,10 +81,18 @@
                         timer: 2000,
                         timerProgressBar: true,
                     });
-                } else {
+                } else if(data.result == 'isRegistered'){
                     Swal.fire({
                         icon: 'error',
                         title: '已經完成報名',
+                        text: '2 秒後跳轉頁面',
+                        timer: 2000,
+                        timerProgressBar: true,
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '人數已達上限',
                         text: '2 秒後跳轉頁面',
                         timer: 2000,
                         timerProgressBar: true,
@@ -108,7 +120,7 @@
                         title: '刪除成功',
                         text: '2 秒後跳轉頁面',
                         timer: 2000,
-                        timerProgressBar: true,
+                        timerProgressBar: true
                     });
                 } else {
                     Swal.fire({
@@ -116,7 +128,7 @@
                         title: '此活動已不存在',
                         text: '2 秒後跳轉頁面',
                         timer: 2000,
-                        timerProgressBar: true,
+                        timerProgressBar: true
                     });
                 }
                 const member = {{ url_for("member")|tojson }};

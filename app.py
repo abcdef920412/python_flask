@@ -50,33 +50,45 @@ def member():
 def event(event_id):
     #print(event_id)
     collection = db["events"]
-    item =  collection.find_one({
+    table =  collection.find_one({
         "_id" : ObjectId(event_id) 
     })
-    if item == None:
+    if table == None:
         return redirect("/error")
-    title = item["title"]
-    date_begin = item["date_begin"]
-    date_end = item["date_end"]
-    location = item["location"]
-    description = item["description"]
-    return render_template("event.html",event_id = event_id, event_title = title, date_begin = date_begin, date_end = date_end , event_location = location, event_description = description)
+    title = table["title"]
+    date_begin = table["date_begin"]
+    date_end = table["date_end"]
+    location = table["location"]
+    description = table["description"]
+    limit_value = table["limit_value"]
+    registered_count = len(table["member"])
+    return render_template("event.html",
+                           event_id = event_id, 
+                           event_title = title, 
+                           date_begin = date_begin, 
+                           date_end = date_end , 
+                           event_location = location, 
+                           event_description = description,
+                           limit_value = limit_value,
+                           registered_count = registered_count
+                           )
 
 @app.route("/register_event/<event_id>")
 def register_event(event_id):
     if "username" in session:
-        member = session["username"]
+        username = session["username"]
         collection = db["events"]
-        filter = {"_id": ObjectId(event_id)}
-        isRegistered = collection.find_one({
-            "_id" : ObjectId(event_id),
-            "member" : member
-        })
-        if isRegistered == None:
-            newvalue = {"$set": {"member": member}}
-            collection.update_one(filter, newvalue)
-            return {'result' : 'Success'}
-
+        filter = {"_id" : ObjectId(event_id)}
+        table = collection.find_one(filter)
+        if username not in table["member"]:
+            limit = table["limit_value"]
+            registered_count = len(table["member"])
+            if limit > registered_count:
+                newvalue = {"$push": {"member": username}}
+                collection.update_one(filter, newvalue)
+                return {'result' : 'Success'}
+            else:
+                return {'result' : 'isFull'}
         return {'result' : 'isRegistered'}
     else:
         return redirect("/error")
@@ -140,29 +152,40 @@ def create():
 
 @app.route("/create_event",methods=["POST"])
 def create_event():
-    title = request.form["title"]
-    date_begin = request.form["date_begin"]
-    date_end = request.form["date_end"]
-    location = request.form["location"]
-    description = request.form["description"]
-    collection = db["users"]
-    host = session["username"]
-    #member = request.form["member"]
-    #tag = request.form["tag"]
-    #requirement = request.form["requirement"]
-    collection = db["events"]
-    collection.insert_one({
-        "title":title,
-        "date_begin":date_begin,
-        "date_end":date_end,
-        "location":location,
-        "description":description,
-        "host":host,
-        #"member":member,#好像沒辦法插入NULL
-        #"tag":tag,
-        #"requirement":requirement,
-    })
-    return redirect("/member")
+    if "username" in session:
+        title = request.form["title"]
+        date_begin = request.form["date_begin"]
+        date_begin = date_begin.replace("T","  ") 
+        date_end = request.form["date_end"]
+        date_end = date_begin.replace("T","   ")
+        location = request.form["location"]
+        limit_value = int(request.form["limit_value"])
+        description = request.form["description"]
+        host = session["username"]
+        member = request.form.getlist("member")[:limit_value]
+
+        #member = request.form["member"]
+        #tag = request.form["tag"]
+        #requirement = request.form["requirement"]
+        collection = db["events"]
+        result = collection.insert_one({
+            "title":title,
+            "date_begin":date_begin,
+            "date_end":date_end,
+            "location":location,
+            "description":description,
+            "host":host,
+            "member":member,
+            "limit_value":limit_value
+            #"tag":tag,
+            #"requirement":requirement,
+        })
+        if result.acknowledged:
+            return {'result' : 'Success'}
+        else:
+            {'result' : 'Faliure'}
+    else:
+        return redirect("/error")
 
 @app.route("/search_event", methods = ["POST"])
 def search_event():
@@ -193,7 +216,6 @@ def delete_event(event_id):
         target = collection.find_one({
             "_id" : ObjectId(event_id) 
         })
-        print("target")
         if target != None:
             collection.delete_one({
                 "_id" : ObjectId(event_id) 
