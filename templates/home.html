@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="home.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
   <title>活動輕鬆報名</title>
 </head>
 <body>
 
   <div class="container">
     <div class="header">{{username}}
-      <img src="head.png" width="30" height="30">
-      <a href="/signout">登出</a><!--拿掉div就排在右邊，但字不知道為啥是藍色-->
+      <img src="{{ url_for('static', filename='head.png') }}" width="30" height="30">
+      <a href="{{ url_for('sign.signout') }}">登出</a><!--拿掉div就排在右邊，但字不知道為啥是藍色-->
     </div>
     <div class="row">
       <div class="column">
@@ -24,7 +24,7 @@
           <hr>
           <label>活動管理</label>
           <ul>
-          <li><a href="/create">新增活動</a></li><br>
+          <li><a href="{{ url_for('event_manage.create') }}">新增活動</a></li><br>
           <li><a href="#">刪除活動</a></li>
           </ul>
           <hr>
@@ -37,7 +37,7 @@
       <div class="column">
         <div class="column-2">
         {% for number in range(num) %}
-          <a href="{{url_for('event', event_id = _id[number])}}">
+          <a href="{{url_for('event_manage.event', event_id = _id[number])}}">
           <div>{{title[number]}}</div>
           </a>
         {% endfor %}
@@ -45,7 +45,7 @@
   </div>
       <div class="column">
         <div class="column-3">
-        <form action="/search_event" method="POST">
+        <form action="{{ url_for('event_manage.search_event') }}" method="POST">
           <label for="site-search">搜尋活動：</label>
           <input type="search" id="site-search" name="q" />
           <input type="submit" value = "搜尋" />
