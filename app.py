@@ -21,7 +21,7 @@ app.register_blueprint(account_manage_bp, url_prefix='/account_manage')
 # 重新定向根路徑到 sign_bp 藍圖的根路徑
 @app.route('/')
 def redirect_to_sign():
-    return redirect(url_for('sign.index')) #檔名.
+    return redirect(url_for('sign.index'))
 
 if __name__ == '__main__':
     app.run(port=3000)
