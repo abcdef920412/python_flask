@@ -46,7 +46,7 @@ def member():
     else :
         return redirect("/")
     
-@app.route("/event/<event_id>")
+@app.route("/event/<event_id>")#顯示活動資訊
 def event(event_id):
     #print(event_id)
     collection = db["events"]
@@ -277,24 +277,55 @@ def end_event():
     else :
         return redirect("/error")
 
-# ... （其他代码）
-
 """@app.route("/permission")
 def permission_adjust():
     command = request.form["command"]
+    target = request.form["user"]
     collection = db["users"]
     if command == "加入黑名單":
 
         for name in username:
-            collection.find({
+            result = collection.find({
                 "username":username,
             })
+        for doc in result:
+            collection.update_many({
+                {"username" : target}, {"$set" : "isban" = true}
+            })
+                
     elif command == "移除黑名單":
 
+        for name in username:
+            result = collection.find({
+                "username":username,
+            })
+        for doc in result:
+            collection.update_many({
+                {"username" : target}, {"$set" : "isban" = false}
+            })
+                
     elif command == "設定為進階使用者":
 
+        for name in username:
+            result = collection.find({
+                "username":username,
+            })
+        for doc in result:
+            collection.update_many({
+                {"username" : target}, {"$set" : "level" = "advanced"}
+            })
+                
     elif command == "設定為一般使用者":
 
+        for name in username:
+            result = collection.find({
+                "username":username,
+            })
+        for doc in result:
+            collection.update_many({
+                {"username" : target}, {"$set" : "level" = "normal"}
+            })
+                
     return render_template("userdata.html")"""
 
 app.run(port = 3000)
