@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="signin.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='signin.css') }}">
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
   <body>
@@ -17,7 +17,7 @@
 
               <h3 align="center">登入 Login</h3>
 
-                <form action="/signin" method="POST">
+                <form action="{{ url_for('sign.signin') }}" method="POST">
 
                 <div class="input-box">
                   <input type="text" id="username" name="username" placeholder="帳號" required>
@@ -33,7 +33,7 @@
                   <input type="submit" value="登入" class="submit">
                 </form>
                 <div class="signing" style="display: flex; justify-content: space-between;">
-                  <a href="/sign" style="color: white;">
+                  <a href="{{ url_for('sign.sign') }}" style="color: white;">
                     <h5 style="color: white;">註冊帳號</h5>
                   </a>
                   <h5 style="cursor: pointer;">訪客登入</h5>

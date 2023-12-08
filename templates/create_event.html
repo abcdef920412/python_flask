@@ -70,7 +70,7 @@
                 data.append(pair[0], pair[1]);
             }
             // 使用 Fetch API 發起 AJAX 請求
-            const create_url = {{ url_for("create_event")|tojson }}
+            const create_url = {{ url_for("event_manage.create_event")|tojson }}
             fetch(create_url,{
                 method: "POST",
                 body: data
@@ -94,8 +94,8 @@
                         timerProgressBar: true,
                     });
                 }
-                const member = {{ url_for("member")|tojson }};
                 setTimeout(() => {
+                    const member = {{ url_for("event_manage.member")|tojson }};
                     window.location.href = member;
                 }, 2000); // 2 秒後跳轉頁面
             })
