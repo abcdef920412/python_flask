@@ -71,7 +71,7 @@ def register_event(event_id):
 @event_manage_bp.route("/error")
 def error():
     message=request.args.get("msg" , "發生錯誤")
-    return render_template("error.html",message=message)
+    return render_template("error.html", message=message)
 
 @event_manage_bp.route("/create")
 def create():
@@ -90,8 +90,6 @@ def create_event():
         description = request.form["description"]
         host = session["username"]
         member = request.form.getlist("member")[:limit_value]
-
-        #member = request.form["member"]
         #tag = request.form["tag"]
         #requirement = request.form["requirement"]
         collection = db["events"]
@@ -145,6 +143,18 @@ def delete_event(event_id):
         if target != None:
             collection.delete_one(filter)
             return {'result' : 'Success'}
-        return {'result' : 'Notfind'}
+        return {'result' : 'Notfound'}
+    else :
+        return redirect(url_for('sign.index'))
+    
+@event_manage_bp.route("/applicant/<event_id>")
+def find_member(event_id):
+    if "username" in session:
+        collection = db["events"]
+        filter = {"_id" : ObjectId(event_id)}
+        target = collection.find_one(filter)
+        if target != None:
+            return target["member"]#誰接
+        return {'result' : 'Notfound'}
     else :
         return redirect(url_for('sign.index'))
