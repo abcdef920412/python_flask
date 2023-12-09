@@ -10,10 +10,10 @@ def getUserdata():
     cursor = collection.find()
     users = []
     for doc in cursor:
-        users.append(doc["username"])
+        users.append([doc["username"], doc["level"], doc["identity"]])#, doc["isban"]])#isban目前不是全部人都有
     return render_template("userdata.html", users = users)
 
-@account_manage_bp.route("/filter")
+@account_manage_bp.route("/filter", methods=["POST"])
 def search_user():
     username = request.form["query"]
     collection = db["users"]
@@ -26,16 +26,16 @@ def search_user():
         "username": { "$regex": username }
     })
     users = []
-    num = 0
     for doc in result:
-        num += 1
-        users.append(doc["username"])
-    return render_template("userdata.html", users = users, num = num)
+        users.append([doc["username"], doc["level"], doc["identity"]])#, doc["isban"]])#isban目前不是全部人都有
+    return render_template("userdata.html", users = users)
 
 @account_manage_bp.route("/permission", methods=["POST"])
 def permission_adjust():
     command = request.form["command"]
     username = request.form.getlist("user")
+    for x in username:
+        print(x)
     collection = db["users"]
     if command == "加入黑名單":
         for name in username:
@@ -63,9 +63,6 @@ def permission_adjust():
             })
     cursor = collection.find()
     users = []
-    num = 0
     for doc in cursor:
-        #users.append({doc["username"], doc["level"], doc["identity"], doc["isban"]})#裡面順序好像不一定
-        users.append(doc["username"])
-        num += 1
-    return render_template("userdata.html", users = users, num = num)
+        users.append([doc["username"], doc["level"], doc["identity"]])#, doc["isban"]])#isban目前不是全部人都有
+    return render_template("userdata.html", users = users)

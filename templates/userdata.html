@@ -36,14 +36,13 @@
       </div>
       <div class="column">
         <div class="column-2">
-        <!--{% for user in users%}
-          <input type = "checkbox" name = "user" value = "{{user[username]}}">{{user}}<br>
-        {% endfor %}-->
-        {% for number in range(num) %}
-        <div class="panel panel-primary" style="border: 2px solid blue; background-color : violet; text-align:center;" >
-        <input type = "checkbox" name = "user" value = "{{username[number]}}">
-        {{username[number]}} {{level[number]}} {{identity[number]}} {{isban[number]}}
-        </div>
+        {% for user in users%}
+          <div class="panel panel-primary" style="border: 2px solid blue; background-color : violet; text-align:left;" >
+          <input type = "checkbox" name = "user" value = "{{user[username]}}">
+          {{user[0]}}<br>
+          {{user[1]}}<br>
+          {{user[2]}}<br>
+          </div>
         {% endfor %}
       </div>
   </div>

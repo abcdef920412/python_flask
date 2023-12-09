@@ -34,6 +34,7 @@ def signup():
         "password":password,
         "identity":identity,
         "level":"normal",
+        "isban":False
     })
     return redirect(url_for('sign.index')) # 使用 url_for 生成 /sign 路由的 URL，然後進行重定向
 
@@ -46,11 +47,12 @@ def signin():
     result = collection.find_one({
         "$and" :[
             {"username":username, 
-             "password":password}
+             "password":password,
+             "isban":False}
         ]
     })
     if result == None:
-        return redirect("/error?msg=帳號密碼輸入錯誤")
+        return redirect("/error?msg=帳號密碼輸入錯誤或是你被ban了")
     session["username"] = result["username"]
     print(session)
     return redirect(url_for('event_manage.member'))
