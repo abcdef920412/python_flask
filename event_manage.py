@@ -7,17 +7,17 @@ event_manage_bp = Blueprint('event_manage', __name__)
 @event_manage_bp.route("/member")
 def member():
     if "username" in session:
-            collection = db["events"]
-            name = session["username"]
-            cursor = collection.find()
-            event = []
-            event_id = []
-            num = 0
-            for doc in cursor:
-                event.append(doc["title"])
-                event_id.append(str(doc["_id"]))
-                num += 1
-            return render_template("home.html", username = name, title = event, _id = event_id, num = num)
+        collection = db["events"]
+        name = session["username"]
+        cursor = collection.find()
+        event = []
+        event_id = []
+        num = 0
+        for doc in cursor:
+            event.append(doc["title"])
+            event_id.append(str(doc["_id"]))
+            num += 1
+        return render_template("home.html", username = name, title = event, _id = event_id, num = num)
     else :
         return redirect(url_for('sign.index'))
 
@@ -77,7 +77,7 @@ def error():
 def create():
    return render_template("create_event.html")
 
-@event_manage_bp.route("/create_event",methods=["POST"])
+@event_manage_bp.route("/create_event", methods=["POST"])
 def create_event():
     if "username" in session:
         title = request.form["title"]

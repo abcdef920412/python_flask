@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
-  <title>活動輕鬆報名</title>
+  <title>帳號管理</title>
 </head>
 <body>
 
@@ -36,19 +36,29 @@
       </div>
       <div class="column">
         <div class="column-2">
+        <!--{% for user in users%}
+          <input type = "checkbox" name = "user" value = "{{user[username]}}">{{user}}<br>
+        {% endfor %}-->
         {% for number in range(num) %}
-          <a href="{{url_for('event_manage.event', event_id = _id[number])}}">
-          <div>{{title[number]}}</div>
-          </a>
+        <div class="panel panel-primary" style="border: 2px solid blue; background-color : violet; text-align:center;" >
+        <input type = "checkbox" name = "user" value = "{{username[number]}}">
+        {{username[number]}} {{level[number]}} {{identity[number]}} {{isban[number]}}
+        </div>
         {% endfor %}
       </div>
   </div>
       <div class="column">
         <div class="column-3">
-        <form action="{{ url_for('event_manage.search_event') }}" method="POST">
-          <label for="site-search">搜尋活動：</label>
-          <input type="search" id="site-search" name="q" />
-          <input type="submit" value = "搜尋" />
+        <form action="{{ url_for('account_manage.search_user') }}" method="POST">
+            <label for="site-search">搜尋使用者：</label>
+            <input type="search" id="user-search" name="query" />
+            <input type="submit" value = "搜尋" />
+        </form>
+        <form action="{{ url_for('account_manage.permission_adjust') }}" method="POST">
+          <input type="submit" name = "command" value = "加入黑名單"/>
+          <input type="submit" name = "command" value = "移除黑名單"/>
+          <input type="submit" name = "command" value = "設定為進階使用者"/>
+          <input type="submit" name = "command" value = "設定為一般使用者"/>
         </form>
       </div>
 	  </div>
