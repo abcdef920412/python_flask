@@ -103,7 +103,7 @@ def create_event():
             "member":member,
             "limit_value":limit_value
             #"tag":tag,
-            #"requirement":requirement,
+            #"requirement":requirement
         })
         if result.acknowledged:
             return {'result' : 'Success'}
@@ -116,6 +116,11 @@ def create_event():
 def search_event():
     name = session["username"]
     event_name = request.form["q"]
+    """可以收進階搜尋
+    wtf = request.form.getlist("host_type")
+    for wtffff in wtf:
+        print(wtffff)
+    """
     collection = db["events"]
     result = collection.find_one({
         "title": { "$regex": event_name }
