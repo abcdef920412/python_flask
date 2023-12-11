@@ -7,17 +7,17 @@ event_manage_bp = Blueprint('event_manage', __name__)
 @event_manage_bp.route("/member")
 def member():
     if "username" in session:
-            collection = db["events"]
-            name = session["username"]
-            cursor = collection.find()
-            event = []
-            event_id = []
-            num = 0
-            for doc in cursor:
-                event.append(doc["title"])
-                event_id.append(str(doc["_id"]))
-                num += 1
-            return render_template("home.html", username = name, title = event, _id = event_id, num = num)
+        collection = db["events"]
+        name = session["username"]
+        cursor = collection.find()
+        event = []
+        event_id = []
+        num = 0
+        for doc in cursor:
+            event.append(doc["title"])
+            event_id.append(str(doc["_id"]))
+            num += 1
+        return render_template("home.html", username = name, title = event, _id = event_id, num = num)
     else :
         return redirect(url_for('sign.index'))
 
@@ -71,13 +71,13 @@ def register_event(event_id):
 @event_manage_bp.route("/error")
 def error():
     message=request.args.get("msg" , "發生錯誤")
-    return render_template("error.html",message=message)
+    return render_template("error.html", message=message)
 
 @event_manage_bp.route("/create")
 def create():
    return render_template("create_event.html")
 
-@event_manage_bp.route("/create_event",methods=["POST"])
+@event_manage_bp.route("/create_event", methods=["POST"])
 def create_event():
     if "username" in session:
         title = request.form["title"]
@@ -90,8 +90,6 @@ def create_event():
         description = request.form["description"]
         host = session["username"]
         member = request.form.getlist("member")[:limit_value]
-
-        #member = request.form["member"]
         #tag = request.form["tag"]
         #requirement = request.form["requirement"]
         collection = db["events"]
@@ -105,7 +103,7 @@ def create_event():
             "member":member,
             "limit_value":limit_value
             #"tag":tag,
-            #"requirement":requirement,
+            #"requirement":requirement
         })
         if result.acknowledged:
             return {'result' : 'Success'}
@@ -118,6 +116,11 @@ def create_event():
 def search_event():
     name = session["username"]
     event_name = request.form["q"]
+    """可以收進階搜尋
+    wtf = request.form.getlist("host_type")
+    for wtffff in wtf:
+        print(wtffff)
+    """
     collection = db["events"]
     result = collection.find_one({
         "title": { "$regex": event_name }
@@ -145,6 +148,18 @@ def delete_event(event_id):
         if target != None:
             collection.delete_one(filter)
             return {'result' : 'Success'}
-        return {'result' : 'Notfind'}
+        return {'result' : 'Notfound'}
+    else :
+        return redirect(url_for('sign.index'))
+    
+@event_manage_bp.route("/applicant/<event_id>")
+def find_member(event_id):
+    if "username" in session:
+        collection = db["events"]
+        filter = {"_id" : ObjectId(event_id)}
+        target = collection.find_one(filter)
+        if target != None:
+            return target["member"]#誰接
+        return {'result' : 'Notfound'}
     else :
         return redirect(url_for('sign.index'))
