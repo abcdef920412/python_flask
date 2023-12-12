@@ -1,0 +1,59 @@
+body {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* 100% 視窗高度 */
+  }
+  
+  .header {
+    background-color: rgb(48, 50, 58); /* 綠色背景，可自行調整顏色 */
+    color: white;
+    padding: 8px;
+  }
+  
+  .row {
+    display: flex;
+    justify-content: space-between; /* 將內容平均分布在行中 */
+    flex: 1; /* 充滿剩餘的高度 */
+  }
+  
+  .column {
+    flex: 1; /* 充滿剩餘的寬度 */
+    padding: 1em;
+    border: 1px solid #ddd; /* 加入邊框效果，可根據需要自行調整 */
+    box-sizing: border-box; /* 避免邊框影響寬度和高度計算 */
+  }
+
+  .header a{
+    text-decoration: none;
+    float:right;
+    padding-top: 8px;
+    color:white;
+  }
+
+  .column-1 a{
+    text-decoration: none;
+    color:black;
+  }
+  
+  .column-1 label{
+    font-weight: bolder;
+  }
+  
+  .column-1 label{
+    font-weight: bold;
+    font-size:large;
+  }
+
+  .column-2 a:link,.column-2 a:visited {
+    color: black;
+    text-decoration: none;
+  }
+
+  .column-2 a:hover,.column-2 a:active {
+    color: #3399CC;
+  }

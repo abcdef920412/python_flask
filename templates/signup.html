@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='signup.css') }}">
+    <style>
+      .radio-container {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .radio-container input {
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="signup_page">
+      <div id="container2">
+
+        <h3 align="center">註冊 Sign Up</h3>
+        <form action="{{ url_for('sign.signup') }}" method="POST">
+          <div class="input-box">
+            <input type="text" id="fullname" name="fullname" placeholder="使用者全名" required>
+            <div class="tab"></div>
+            <br>
+            <input type="text" id="username2" name="username" placeholder="帳號" required>
+            <div class="tab"></div>
+            <br>
+            <input type="password" id="password2" name="password" placeholder="密碼" required>
+            <div class="tab"></div>
+            <br>
+            <input type="password" id="comfirm_password" name="comfirm_password" placeholder="確認密碼" required>
+            <div class="tab"></div>
+            <br>
+          </div>
+          <div class="radio-container">
+            <div>
+              <input type="radio" name="identity" value="student">學生
+            </div>
+            <div>
+              <input type="radio" name="identity" value="teacher">老師
+            </div>
+            <div>
+              <input type="radio" name="identity" value="staff">行政人員
+            </div>
+          </div>
+          <input type="submit" value="註冊" class="submit">
+        </form>
+
+        <a href="/" style="color: white;"><h5 class="left" >登入帳號</h5></a>
+
+      </div><!-- container2 end-->
+    </div><!-- signup_page end--> 
+  </body>
+</html>

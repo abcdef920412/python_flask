@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <title>創建活動</title>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
+    <style>
+        .container{
+            width:35em;
+            margin-top: 30px;
+        }
+        .section1{
+            box-shadow: 0 0px 100px rgba(41, 39, 39, 0.103);
+            padding:20px;
+            padding-left: 40px;
+            padding-right: 40px;
+            padding-bottom: 70px;
+        }
+        h3{
+            border-color: black;
+            text-align: center;
+            justify-content: center;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .container button[type=submit] {
+            float: right;
+            width: 80px;
+            background-color: #3492df;
+            border: none;
+        }
+    </style>
+
+    <form id="eventForm" method="POST">
+        <div class="container">
+            <div class="section1">
+                <h3>新增活動</h3>
+                <label for="title" class="form-label">活動標題:</label><br>
+                <input id="title" class="form-control" type="text" name="title" required><br>
+                <label for="date_begin" class="form-label">開始時間:</label><br>
+                <input id="date_begin" class="form-control" type="datetime-local" name="date_begin" onchange="setEndDate()" required><br>
+                <label for="date_end" class="form-label">結束時間:</label><br>
+                <input id="date_end" class="form-control" type="datetime-local" name="date_end" required><br>
+                <label for="location" class="form-label">活動地點:</label><br>
+                <input id="location" class="form-control" type="text" name="location" required><br>
+                <label for="limit_value" class="form-label">人數上限:</label><br>
+                <input id="limit_value" class="form-control" type="number" name="limit_value" min="1" required><br>
+                <label for="description" class="form-label" >活動介紹:</label><br>
+                <textarea class="form-control" name="description" id="description" cols="30" rows="10" required></textarea><br>
+                <button class="btn btn-primary" type="submit">創建</button>
+            </div>
+        </div>
+    </form>
+    <script>
+        function setEndDate() { //輸入完 date_begin 時，date_end = date_begin
+            var startDateValue = document.getElementById("date_begin").value;
+            document.getElementById("date_end").value = startDateValue;
+        }
+        document.getElementById('eventForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            const formElement = event.target;
+            const data = new URLSearchParams();
+            for (const pair of new FormData(formElement)) {
+                data.append(pair[0], pair[1]);
+            }
+            // 使用 Fetch API 發起 AJAX 請求
+            const create_url = {{ url_for("event_manage.create_event")|tojson }}
+            fetch(create_url,{
+                method: "POST",
+                body: data
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result == 'Success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '活動創建成功',
+                        text: '2 秒後跳轉頁面',
+                        timer: 2000,
+                        timerProgressBar: true,
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '發生錯誤',
+                        text: '2 秒後跳轉頁面',
+                        timer: 2000,
+                        timerProgressBar: true,
+                    });
+                }
+                setTimeout(() => {
+                    const member = {{ url_for("event_manage.member")|tojson }};
+                    window.location.href = member;
+                }, 2000); // 2 秒後跳轉頁面
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+            });
+        });       
+    </script>
+</body>   
+</html>
