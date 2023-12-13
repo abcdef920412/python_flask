@@ -1,25 +1,10 @@
-from sign import *
-from event_manage import *
-from account_manage import *
+from flask import Blueprint, render_template, redirect, session
+from datetime import datetime
+from db_conn import db
 
-@app.route("/member")
-def member():
-    if "username" in session:
-            collection = db["events"]
-            name = session["username"]
-            cursor = collection.find()
-            event = []
-            event_id = []
-            num = 0
-            for doc in cursor:
-                event.append(doc["title"])
-                event_id.append(str(doc["_id"]))
-                num += 1
-            return render_template("home.html", username = name, title = event, _id = event_id, num = num)
-    else :
-        return redirect("/")
-    
-@app.route("/attend_event")#自己有報名的活動
+event_list_bp = Blueprint('event_list', __name__)
+
+@event_list_bp.route("/attend_event")#自己有報名的活動
 def attend_event():
     if "username" in session:
         collection = db["events"]
@@ -33,8 +18,8 @@ def attend_event():
         return render_template("home.html", username = name, title = event)
     else :
         return redirect("/error")
-    
-@app.route("/my_event")#自己創的活動
+
+@event_list_bp.route("/my_event")#自己創的活動
 def my_event():
     if "username" in session:
         collection = db["events"]
@@ -47,9 +32,9 @@ def my_event():
             event.append(doc["title"])
         return render_template("home.html", username = name, title = event)
     else :
-        return redirect("/error")  
-
-@app.route("/end_event")#自己有參加(報名)且已結束的活動
+        return redirect("/error")
+    
+@event_list_bp.route("/end_event")#自己有參加(報名)且已結束的活動
 def end_event():
     if "username" in session:
         collection = db["events"]
@@ -69,4 +54,4 @@ def end_event():
             event.append(doc["title"])
         return render_template("home.html", username = name, title = event)
     else :
-        return redirect("/error")  
+        return redirect("/error")

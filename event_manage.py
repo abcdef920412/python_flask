@@ -1,8 +1,27 @@
-from sign import *
-from account_manage import *
-from event_list import *
+from flask import Blueprint, render_template, redirect, url_for, request, session
+from bson import ObjectId
+from db_conn import db
 
-@app.route("/event/<event_id>")
+event_manage_bp = Blueprint('event_manage', __name__)
+
+@event_manage_bp.route("/member")
+def member():
+    if "username" in session:
+        collection = db["events"]
+        name = session["username"]
+        cursor = collection.find()
+        event = []
+        event_id = []
+        num = 0
+        for doc in cursor:
+            event.append(doc["title"])
+            event_id.append(str(doc["_id"]))
+            num += 1
+        return render_template("home.html", username = name, title = event, _id = event_id, num = num)
+    else :
+        return redirect(url_for('sign.index'))
+
+@event_manage_bp.route("/event/<event_id>")
 def event(event_id):
     #print(event_id)
     collection = db["events"]
@@ -10,7 +29,7 @@ def event(event_id):
         "_id" : ObjectId(event_id) 
     })
     if table == None:
-        return redirect("/error")
+        return redirect("/error?404")
     title = table["title"]
     date_begin = table["date_begin"]
     date_end = table["date_end"]
@@ -29,7 +48,7 @@ def event(event_id):
                            registered_count = registered_count
                            )
 
-@app.route("/register_event/<event_id>")
+@event_manage_bp.route("/register_event/<event_id>")
 def register_event(event_id):
     if "username" in session:
         username = session["username"]
@@ -48,26 +67,29 @@ def register_event(event_id):
         return {'result' : 'isRegistered'}
     else:
         return redirect("/error")
-    
-@app.route("/create")
-def create():
-    return render_template("create_event.html") 
 
-@app.route("/create_event",methods=["POST"])
+@event_manage_bp.route("/error")
+def error():
+    message=request.args.get("msg" , "發生錯誤")
+    return render_template("error.html", message=message)
+
+@event_manage_bp.route("/create")
+def create():
+   return render_template("create_event.html")
+
+@event_manage_bp.route("/create_event", methods=["POST"])
 def create_event():
     if "username" in session:
         title = request.form["title"]
         date_begin = request.form["date_begin"]
         date_begin = date_begin.replace("T","  ") 
         date_end = request.form["date_end"]
-        date_end = date_begin.replace("T","   ")
+        date_end = date_begin.replace("T","  ")
         location = request.form["location"]
         limit_value = int(request.form["limit_value"])
         description = request.form["description"]
         host = session["username"]
         member = request.form.getlist("member")[:limit_value]
-
-        #member = request.form["member"]
         #tag = request.form["tag"]
         #requirement = request.form["requirement"]
         collection = db["events"]
@@ -81,7 +103,7 @@ def create_event():
             "member":member,
             "limit_value":limit_value
             #"tag":tag,
-            #"requirement":requirement,
+            #"requirement":requirement
         })
         if result.acknowledged:
             return {'result' : 'Success'}
@@ -90,10 +112,15 @@ def create_event():
     else:
         return redirect("/error")
 
-@app.route("/search_event", methods = ["POST"])
+@event_manage_bp.route("/search_event", methods = ["POST"])
 def search_event():
     name = session["username"]
     event_name = request.form["q"]
+    """可以收進階搜尋
+    wtf = request.form.getlist("host_type")
+    for wtffff in wtf:
+        print(wtffff)
+    """
     collection = db["events"]
     result = collection.find_one({
         "title": { "$regex": event_name }
@@ -112,18 +139,27 @@ def search_event():
         event.append(doc["title"])
     return render_template("home.html", username = name, title = event, num = num , _id = event_id)
 
-@app.route("/delete_event/<event_id>")
+@event_manage_bp.route("/delete_event/<event_id>")
 def delete_event(event_id):
     if "username" in session:
         collection = db["events"]
-        target = collection.find_one({
-            "_id" : ObjectId(event_id) 
-        })
+        filter = {"_id" : ObjectId(event_id)}
+        target = collection.find_one(filter)
         if target != None:
-            collection.delete_one({
-                "_id" : ObjectId(event_id) 
-            })
+            collection.delete_one(filter)
             return {'result' : 'Success'}
-        return {'result' : 'Notfind'}
+        return {'result' : 'Notfound'}
     else :
-        return redirect("/error")
+        return redirect(url_for('sign.index'))
+    
+@event_manage_bp.route("/applicant/<event_id>")
+def find_member(event_id):
+    if "username" in session:
+        collection = db["events"]
+        filter = {"_id" : ObjectId(event_id)}
+        target = collection.find_one(filter)
+        if target != None:
+            return target["member"]#誰接
+        return {'result' : 'Notfound'}
+    else :
+        return redirect(url_for('sign.index'))
