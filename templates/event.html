@@ -37,11 +37,12 @@
             background-color: #3492df;
             border: none;
         }
-
-
         #deletion {
             margin-right: 15px;
         }
+        pre {
+            white-space: pre-line;
+        } // 保留換行符號
     </style>
 
     <div class="container">
@@ -56,7 +57,7 @@
             <h5 id="event_location" class="form-label">活動地點:</h5>
             <p>{{event_location}}</p>
             <h5 id="event_description" class="form-label" >活動介紹:</h5>
-            <p>{{event_description}}</p>
+            <p><pre>{{event_description}}</pre></p>
             <h5 id="event_description" class="form-label" >人數限制:</h5>
             <p>{{limit_value}}</p>
             <h5 id="event_description" class="form-label" >尚餘名額:</h5>
@@ -69,7 +70,7 @@
         var registrationButton = document.getElementById('registration');
         registrationButton.addEventListener('click', function () {  
             // 使用 Fetch API 發起 AJAX 請求
-            const register_url = {{ url_for("register_event", event_id = event_id)|tojson }}
+            const register_url = {{ url_for("event_manage.register_event", event_id = event_id)|tojson }}
             fetch(register_url)
             .then(response => response.json())
             .then(data => {
@@ -98,7 +99,7 @@
                         timerProgressBar: true,
                     });
                 }
-                const member = {{ url_for("member")|tojson }};
+                const member = {{ url_for("event_manage.member")|tojson }};
                 setTimeout(() => {
                     window.location.href = member;
                 }, 2000); // 2 秒後跳轉頁面
@@ -110,7 +111,7 @@
         var deleteButton = document.getElementById('deletion');
         deleteButton.addEventListener('click', function () {  
             // 使用 Fetch API 發起 AJAX 請求
-            const delete_url = {{ url_for("delete_event", event_id = event_id)|tojson }}
+            const delete_url = {{ url_for("event_manage.delete_event", event_id = event_id)|tojson }}
             fetch(delete_url)
             .then(response => response.json())
             .then(data => {
@@ -131,7 +132,7 @@
                         timerProgressBar: true
                     });
                 }
-                const member = {{ url_for("member")|tojson }};
+                const member = {{ url_for("event_manage.member")|tojson }};
                 setTimeout(() => {
                     window.location.href = member;
                 }, 2000); // 2 秒後跳轉頁面

@@ -8,7 +8,13 @@ event_manage_bp = Blueprint('event_manage', __name__)
 def member():
     if "username" in session:
         collection = db["events"]
+        collection1 = db['users']
         name = session["username"]
+        cu = collection1.find(
+            {"username": name}
+        )
+        for doc in cu:
+            level=doc['level']
         cursor = collection.find()
         event = []
         event_id = []
@@ -17,7 +23,7 @@ def member():
             event.append(doc["title"])
             event_id.append(str(doc["_id"]))
             num += 1
-        return render_template("home.html", username = name, title = event, _id = event_id, num = num)
+        return render_template("home.html", username = name, title = event, _id = event_id, num = num,level=level)
     else :
         return redirect(url_for('sign.index'))
 
