@@ -126,18 +126,13 @@ def search_event():
         "title": { "$regex": event_name }
     })
     if result == None:
-        return redirect("/error?msg=找不到此活動")
-    num = 0
+        return {'result' : 'notFind'}
     result = collection.find({
         "title": { "$regex": event_name }
     })
-    event = []
-    event_id= []
-    for doc in result:
-        num += 1
-        event_id.append(str(doc["_id"]))
-        event.append(doc["title"])
-    return render_template("home.html", username = name, title = event, num = num , _id = event_id)
+    events = [{"_id": str(doc["_id"]), "title": doc["title"]} for doc in result]
+
+    return {"title": [event["title"] for event in events], "num": len(events), "_id": [event["_id"] for event in events]}
 
 @event_manage_bp.route("/delete_event/<event_id>")
 def delete_event(event_id):

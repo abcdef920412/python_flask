@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
   <title>活動輕鬆報名</title>
 </head>
 <body>
-
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
   <div class="container">
     <div class="header">{{username}}
       <img src="{{ url_for('static', filename='head.png') }}" width="30" height="30">
@@ -35,7 +36,7 @@
         </div>
       </div>
       <div class="column">
-        <div class="column-2">
+        <div class="column-2" id="searchResultsContainer">
         {% for number in range(num) %}
           <a href="{{url_for('event_manage.event', event_id = _id[number])}}">
           <div>{{title[number]}}</div>
@@ -45,7 +46,7 @@
   </div>
       <div class="column">
         <div class="column-3">
-        <form action="{{ url_for('event_manage.search_event') }}" method="POST">
+        <form id="searchForm" action="{{ url_for('event_manage.search_event') }}" method="POST">
           <label for="site-search">搜尋活動：</label>
           <input type="search" id="site-search" name="q" />
           <input type="submit" value = "搜尋" />
@@ -73,6 +74,49 @@
 	  </div>
     </div>
   </div>
+  <script>
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent the default form submission
+      const formElement = event.target;
+      const data = new URLSearchParams();
+      for (const pair of new FormData(formElement)) {
+          data.append(pair[0], pair[1]);
+      }
+      // 使用 Fetch API 發起 AJAX 請求
+      const create_url = {{ url_for('event_manage.search_event')|tojson }}
+      fetch(create_url,{
+          method: "POST",
+          body: data
+      })
+      .then(response => response.json())  // 假設響應是 JSON
+         .then(data => {
+          if (data.result == 'notFind') {
+            Swal.fire({
+              icon: 'error',
+              title: '活動不存在',
+              timer: 2000,
+              timerProgressBar: true,
+            });
+            // 使用從伺服器收到的數據更新你的頁面
+          }
+          else{
+            updateHomePage(data);
+          }
+         })
+         .catch(error => console.error('錯誤:', error));
+      });
+
+        // 添加一個函數，用於更新 home.html 中的資料
+      function updateHomePage(data) {
+        // 將搜索結果顯示在 searchResultsContainer 中
+        document.getElementById('searchResultsContainer').innerHTML = generateHTML(data);
+        const titlesHTML = data.title.map(title => `<div>${title}</div>`).join('');
+        searchResultsContainer.innerHTML = `</div>${titlesHTML}`;
+      }
+
+       
+
+  </script>
 
 </body>
 </html>

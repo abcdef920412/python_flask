@@ -111,35 +111,48 @@
         var deleteButton = document.getElementById('deletion');
         deleteButton.addEventListener('click', function () {  
             // 使用 Fetch API 發起 AJAX 請求
-            const delete_url = {{ url_for("event_manage.delete_event", event_id = event_id)|tojson }}
-            fetch(delete_url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.result == 'Success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '刪除成功',
-                        text: '2 秒後跳轉頁面',
-                        timer: 2000,
-                        timerProgressBar: true
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: '此活動已不存在',
-                        text: '2 秒後跳轉頁面',
-                        timer: 2000,
-                        timerProgressBar: true
+            Swal.fire({
+                title: "是否確定刪除？",
+                text: "刪除後將無法回復！",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                cancelButtonText:"取消",
+                confirmButtonText: "確定"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    const delete_url = {{ url_for("event_manage.delete_event", event_id = event_id)|tojson }}
+                    fetch(delete_url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.result == 'Success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '刪除成功',
+                                text: '2 秒後跳轉頁面',
+                                timer: 2000,
+                                timerProgressBar: true
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: '此活動已不存在',
+                                text: '2 秒後跳轉頁面',
+                                timer: 2000,
+                                timerProgressBar: true
+                            });
+                        }
+                        const member = {{ url_for("event_manage.member")|tojson }};
+                        setTimeout(() => {
+                            window.location.href = member;
+                        }, 2000); // 2 秒後跳轉頁面
+                    })
+                    .catch(error => {
+                        console.error('Fetch Error:', error);
                     });
                 }
-                const member = {{ url_for("event_manage.member")|tojson }};
-                setTimeout(() => {
-                    window.location.href = member;
-                }, 2000); // 2 秒後跳轉頁面
-            })
-            .catch(error => {
-                console.error('Fetch Error:', error);
-            });
+              });
         });
     </script>
 </body>
