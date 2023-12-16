@@ -17,22 +17,28 @@
     <div class="row">
       <div class="column">
         <div class="column-1">
+          <div id = "show1">
           <label>查看活動</label> 
           <ul>
             <li><a href="#">查看已參加活動</a></li><br>
             <li><a href="#">查看已報名活動</a></li>
           </ul>
           <hr>
+          </div>
+          <div id = "show2">
           <label>活動管理</label>
           <ul>
           <li><a href="{{ url_for('event_manage.create') }}">新增活動</a></li><br>
           <li><a href="#">刪除活動</a></li>
           </ul>
           <hr>
+          </div>
+          <div id = "show3">
           <label>帳號管理</label>
           <ul>
             <li><a href="{{ url_for('account_manage.getUserdata') }}">帳號管理</a></li>
             </ul>
+            </div>
         </div>
       </div>
       <div class="column">
@@ -74,7 +80,24 @@
 	  </div>
     </div>
   </div>
-  <script>
+  <script >
+    var level = '{{level}}';
+    console.log(level);
+    var block1 = document.getElementById('show1');
+    var block2 = document.getElementById('show2');
+    var block3 = document.getElementById('show3');
+    if(level == "visitor"){
+        block1.style.display = "none";
+        block2.style.display = "none";
+        block3.style.display = "none";
+     }else if(level == "normal"){
+        block2.style.display = "none";
+        block3.style.display = "none";
+    }else if(level == "advanced"){
+        block3.style.display = "none";
+    }else if(level == "admin"){
+    }
+
     document.getElementById('searchForm').addEventListener('submit', function(event) {
       event.preventDefault(); // Prevent the default form submission
       const formElement = event.target;
@@ -88,7 +111,7 @@
           method: "POST",
           body: data
       })
-      .then(response => response.json())  // 假設響應是 JSON
+      .then(response => response.json())
          .then(data => {
           if (data.result == 'notFind') {
             Swal.fire({
@@ -97,25 +120,20 @@
               timer: 2000,
               timerProgressBar: true,
             });
-            // 使用從伺服器收到的數據更新你的頁面
+            // 清空搜索字段
+            formElement.reset();
           }
-          else{
-            updateHomePage(data);
-          }
+          // 將搜索結果顯示在 searchResultsContainer 中
+          const titlesHTML = data.title.map((title, index) => `
+          <a href="event/${data._id[index]}">
+          <div>${title}</div>
+          </a>
+          `).join('');
+      
+          document.getElementById('searchResultsContainer').innerHTML = titlesHTML;
          })
          .catch(error => console.error('錯誤:', error));
       });
-
-        // 添加一個函數，用於更新 home.html 中的資料
-      function updateHomePage(data) {
-        // 將搜索結果顯示在 searchResultsContainer 中
-        document.getElementById('searchResultsContainer').innerHTML = generateHTML(data);
-        const titlesHTML = data.title.map(title => `<div>${title}</div>`).join('');
-        searchResultsContainer.innerHTML = `</div>${titlesHTML}`;
-      }
-
-       
-
   </script>
 
 </body>

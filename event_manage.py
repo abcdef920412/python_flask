@@ -8,7 +8,13 @@ event_manage_bp = Blueprint('event_manage', __name__)
 def member():
     if "username" in session:
         collection = db["events"]
+        collection1 = db['users']
         name = session["username"]
+        cu = collection1.find(
+            {"username": name}
+        )
+        for doc in cu:
+            level=doc['level']
         cursor = collection.find()
         event = []
         event_id = []
@@ -17,7 +23,7 @@ def member():
             event.append(doc["title"])
             event_id.append(str(doc["_id"]))
             num += 1
-        return render_template("home.html", username = name, title = event, _id = event_id, num = num)
+        return render_template("home.html", username = name, title = event, _id = event_id, num = num,level=level)
     else :
         return redirect(url_for('sign.index'))
 
@@ -88,10 +94,13 @@ def create_event():
         location = request.form["location"]
         limit_value = int(request.form["limit_value"])
         description = request.form["description"]
+        organizingGroup = request.form["organizingGroup"]
+        activityType = request.form["activityType"]
+        requirement = request.form["identity"]
         host = session["username"]
         member = request.form.getlist("member")[:limit_value]
-        #tag = request.form["tag"]
-        #requirement = request.form["requirement"]
+        tag_values = [organizingGroup, activityType] # 根據設計文件皆為 tag
+        
         collection = db["events"]
         result = collection.insert_one({
             "title":title,
@@ -101,20 +110,19 @@ def create_event():
             "description":description,
             "host":host,
             "member":member,
-            "limit_value":limit_value
-            #"tag":tag,
-            #"requirement":requirement
+            "limit_value":limit_value,
+            "tag":tag_values,
+            "requirement":requirement
         })
         if result.acknowledged:
             return {'result' : 'Success'}
         else:
             {'result' : 'Faliure'}
     else:
-        return redirect("/error")
+        return redirect(url_for('sign.index'))
 
 @event_manage_bp.route("/search_event", methods = ["POST"])
 def search_event():
-    name = session["username"]
     event_name = request.form["q"]
     """可以收進階搜尋
     wtf = request.form.getlist("host_type")
@@ -122,17 +130,31 @@ def search_event():
         print(wtffff)
     """
     collection = db["events"]
-    result = collection.find_one({
-        "title": { "$regex": event_name }
-    })
-    if result == None:
-        return {'result' : 'notFind'}
     result = collection.find({
-        "title": { "$regex": event_name }
+        "title": {"$regex": event_name}
     })
+
     events = [{"_id": str(doc["_id"]), "title": doc["title"]} for doc in result]
 
-    return {"title": [event["title"] for event in events], "num": len(events), "_id": [event["_id"] for event in events]}
+    if not events:
+        all_events = collection.find({})
+        all_events_list = [
+            {"_id": str(doc["_id"]), "title": doc["title"]} for doc in all_events
+        ]
+
+        return {
+            "result": "notFind",
+            "title": [event["title"] for event in all_events_list],
+            "num": len(all_events_list),
+            "_id": [event["_id"] for event in all_events_list],
+        }
+
+    return {
+        "result": "Find",
+        "title": [event["title"] for event in events],
+        "num": len(events),
+        "_id": [event["_id"] for event in events],
+    }
 
 @event_manage_bp.route("/delete_event/<event_id>")
 def delete_event(event_id):

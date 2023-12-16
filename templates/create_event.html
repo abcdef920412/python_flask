@@ -11,16 +11,17 @@
 </head>
 <body>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@2.1.1/build/global/luxon.min.js"></script>
     <style>
         .container{
-            width:35em;
+            width:40em;
             margin-top: 30px;
         }
         .section1{
             box-shadow: 0 0px 100px rgba(41, 39, 39, 0.103);
             padding:20px;
-            padding-left: 40px;
-            padding-right: 40px;
+            padding-left: 50px;
+            padding-right: 50px;
             padding-bottom: 70px;
         }
         h3{
@@ -35,24 +36,91 @@
             background-color: #3492df;
             border: none;
         }
+
     </style>
 
-    <form id="eventForm" method="POST">
+    <form id="eventForm" method="POST"  class="needs-validation" novalidate>
         <div class="container">
             <div class="section1">
                 <h3>新增活動</h3>
                 <label for="title" class="form-label">活動標題:</label><br>
-                <input id="title" class="form-control" type="text" name="title" required><br>
-                <label for="date_begin" class="form-label">開始時間:</label><br>
-                <input id="date_begin" class="form-control" type="datetime-local" name="date_begin" onchange="setEndDate()" required><br>
-                <label for="date_end" class="form-label">結束時間:</label><br>
-                <input id="date_end" class="form-control" type="datetime-local" name="date_end" required><br>
+                <input id="title" class="form-control" type="text" name="title" required>
+                <div class="invalid-feedback">請輸入活動標題</div><br>
+
                 <label for="location" class="form-label">活動地點:</label><br>
-                <input id="location" class="form-control" type="text" name="location" required><br>
-                <label for="limit_value" class="form-label">人數上限:</label><br>
-                <input id="limit_value" class="form-control" type="number" name="limit_value" min="1" required><br>
+                <input id="location" class="form-control" type="text" name="location" required>
+                <div class="invalid-feedback">請輸入活動地點</div><br>
+
+                <div style="display: flex; justify-content: space-between;">                    
+                    <div style="width: 48%;">
+                        <label for="date_begin" class="form-label">開始時間:</label><br>
+                        <input id="date_begin" class="form-control" type="datetime-local" name="date_begin" onchange="setEndDate()" required>
+                        <div class="invalid-feedback">請輸入開始時間</div>
+                    </div>
+                    <br>
+
+                    <div style="width: 48%;">
+                        <label for="date_end" class="form-label">結束時間:</label><br>
+                        <input id="date_end" class="form-control" type="datetime-local" name="date_end" onchange="handleInput()" required>
+                        <div id="endDateError" class="invalid-feedback"></div>
+                    </div>
+                </div><br>
+                
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="width: 48%;">
+                        <label for="identity" class="form-label">身分選擇:</label><br>
+                        <select id="identity" class="form-control" name="identity" required>
+                            <option value="all">不限制</option>
+                            <option value="teacher">老師</option>
+                            <option value="student">學生</option>
+                            <option value="staff">行政人員</option>
+                        </select>
+                        <div class="invalid-feedback">請輸入身分選擇</div><br>
+                    </div>
+            
+                    <div style="width: 48%;">
+                        <label for="limit_value" class="form-label">人數上限:</label><br>
+                        <input id="limit_value" class="form-control" type="number" name="limit_value" min="1" required>
+                        <div class="invalid-feedback">請輸入人數上限</div><br>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="width: 48%;">
+                        <label for="organizingGroup" class="form-label">舉辦團體:</label><br>
+                        <select id="organizingGroup" class="form-control" name="organizingGroup" required>
+                            <option value="">請選擇</option>
+                            <option value="個人">個人</option>
+                            <option value="校內社團">校內社團</option>
+                            <option value="校內系所">校內系所</option>
+                            <option value="學校">學校</option>
+                            <option value="校外">校外</option>
+                            <option value="政府">政府</option>
+                        </select>
+                        <div class="invalid-feedback">請輸入舉辦團體</div>
+                    </div>
+                    <br>
+    
+                    <div style="width: 48%;">
+                        <label for="activityType" class="form-label">活動類型:</label><br>
+                        <select id="activityType" class="form-control" name="activityType" required>
+                            <option value="">請選擇</option>
+                            <option value="學系">學系</option>
+                            <option value="學術">學術</option>
+                            <option value="學藝">學藝</option>
+                            <option value="康樂">康樂</option>
+                            <option value="服務">服務</option>
+                            <option value="體育">體育</option>
+                            <option value="聯誼">聯誼</option>
+                        </select>
+                        <div class="invalid-feedback">請輸入活動類型</div>
+                    </div>
+                </div><br>
+
                 <label for="description" class="form-label" >活動介紹:</label><br>
-                <textarea class="form-control" name="description" id="description" cols="30" rows="10" required></textarea><br>
+                <textarea class="form-control" name="description" id="description" cols="30" rows="10" required></textarea>
+                <div class="invalid-feedback">請輸入活動介紹</div><br>
+                
                 <button class="btn btn-primary" type="submit">創建</button>
             </div>
         </div>
@@ -61,23 +129,119 @@
         function setEndDate() { //輸入完 date_begin 時，date_end = date_begin
             var startDateValue = document.getElementById("date_begin").value;
             document.getElementById("date_end").value = startDateValue;
+            handleInput();
         }
-        document.getElementById('eventForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the default form submission
-            const formElement = event.target;
-            const data = new URLSearchParams();
-            for (const pair of new FormData(formElement)) {
-                data.append(pair[0], pair[1]);
+
+        function handleInput() {
+            const validationResult = validateEndDate();
+            
+            // If the validation result is invalid, set the input as invalid
+            if (!validationResult.isValid) {
+                document.getElementById('date_end').setCustomValidity('Invalid');
+            } else {
+            // If the validation result is valid, clear the custom validity
+                document.getElementById('date_end').setCustomValidity('');
             }
-            // 使用 Fetch API 發起 AJAX 請求
-            const create_url = {{ url_for("event_manage.create_event")|tojson }}
-            fetch(create_url,{
-                method: "POST",
-                body: data
+        }
+        
+        function validateEndDate() {
+            const startDateInput = document.getElementById('date_begin');
+            const endDateInput = document.getElementById('date_end');
+            const endDateError = document.getElementById('endDateError');
+        
+            // Initialize the validation result object
+            const validationResult = {
+                isValid: true,
+                message: ''
+            };
+        
+            // Check if end date is empty
+            if (endDateInput.value === "") {
+                validationResult.isValid = false;
+                validationResult.message = '請輸入結束時間';
+                endDateInput.classList.add('is-invalid');
+                endDateInput.classList.remove('is-valid');
+            } else {
+                // Check if end date is later than start date
+                const startDate = luxon.DateTime.fromISO(startDateInput.value);
+                const endDate = luxon.DateTime.fromISO(endDateInput.value);
+        
+                if (endDate <= startDate) {
+                    validationResult.isValid = false;
+                    validationResult.message = '結束時間需晚於開始時間';
+                    endDateInput.classList.add('is-invalid');
+                    endDateInput.classList.remove('is-valid');
+                } else {
+                    endDateInput.classList.remove('is-invalid');
+                    endDateInput.classList.add('is-valid');
+                    validationResult.message = ''; // Clear error message
+                }
+            }
+        
+            // Update the Bootstrap invalid-feedback message
+            endDateError.textContent = validationResult.message;
+        
+            // Return the validation result object
+            return validationResult;
+        }
+        
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (function () {
+            'use strict'
+        
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.querySelectorAll('.needs-validation')
+        
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+        
+                form.classList.add('was-validated')
+                }, false)
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.result == 'Success') {
+        })()
+        document.getElementById('eventForm').addEventListener('submit', async function(event) {
+            event.preventDefault();// Prevent the default form submission
+
+            const formElement = event.target;
+
+            try {
+                // 手動觸發 Bootstrap 驗證
+                formElement.classList.add('was-validated');
+        
+                // 等待一小段時間，確保 Bootstrap 驗證樣式能夠被正確應用
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                if (!formElement.checkValidity()) {
+                    return;
+                }
+        
+                // 其他驗證
+                if (!validateEndDate().isValid) {
+                    return;
+                }
+        
+                // 如果所有驗證都通過，表單提交
+                const data = new URLSearchParams();
+                for (const pair of new FormData(formElement)) {
+                    data.append(pair[0], pair[1]);
+                }
+        
+                // 使用 Fetch API 发起 AJAX 请求
+                const create_url = {{ url_for("event_manage.create_event")|tojson }};
+                const response = await fetch(create_url, {
+                    method: "POST",
+                    body: data
+                });
+        
+                const responseData = await response.json();
+
+                if (responseData.result === 'Success') {
                     Swal.fire({
                         icon: 'success',
                         title: '活動創建成功',
@@ -85,6 +249,11 @@
                         timer: 2000,
                         timerProgressBar: true,
                     });
+        
+                    setTimeout(() => {
+                        const member = {{ url_for("event_manage.member")|tojson }};
+                        window.location.href = member;
+                    }, 2000); // 2 秒後跳轉頁面
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -94,15 +263,17 @@
                         timerProgressBar: true,
                     });
                 }
-                setTimeout(() => {
-                    const member = {{ url_for("event_manage.member")|tojson }};
-                    window.location.href = member;
-                }, 2000); // 2 秒後跳轉頁面
-            })
-            .catch(error => {
-                console.error('Fetch Error:', error);
-            });
-        });       
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: '發生錯誤',
+                    text: '2 秒後跳轉頁面',
+                    timer: 2000,
+                    timerProgressBar: true,
+                });
+            }
+        });
     </script>
 </body>   
 </html>
