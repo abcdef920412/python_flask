@@ -26,8 +26,6 @@
           <hr>
           </div>
           <div id = "show2">
-          </div>
-          <div id = "show2">
           <label>活動管理</label>
           <ul>
           <li><a href="{{ url_for('event_manage.create') }}">新增活動</a></li><br>
@@ -36,13 +34,10 @@
           <hr>
           </div>
           <div id = "show3">
-          </div>
-          <div id = "show3">
           <label>帳號管理</label>
           <ul>
             <li><a href="{{ url_for('account_manage.getUserdata') }}">帳號管理</a></li>
             </ul>
-            </div>
             </div>
         </div>
       </div>
@@ -57,35 +52,37 @@
   </div>
       <div class="column">
         <div class="column-3">
-        <form id="searchForm" action="{{ url_for('event_manage.search_event') }}" method="POST">
+          <form id="searchForm" action="{{ url_for('event_manage.search_event') }}" method="POST">
           <label for="site-search">搜尋活動：</label>
           <input type="search" id="site-search" name="q" />
           <input type="submit" value = "搜尋" />
-        <div>
-          <label>舉辦團體：<br></label>
-          <input type = "checkbox" name = "host_type" value = "個人">個人<br>
-          <input type = "checkbox" name = "host_type" value = "校內社團">校內社團<br>
-          <input type = "checkbox" name = "host_type" value = "校內系所">校內系所<br>
-          <input type = "checkbox" name = "host_type" value = "學校">學校<br>
-          <input type = "checkbox" name = "host_type" value = "校外">校外<br>
-          <input type = "checkbox" name = "host_type" value = "政府">政府<br>
-        </div>
-        <div>
-          <label>活動類型：<br></label>
-          <input type = "checkbox" name = "event_type" value = "學系">學系<br>
-          <input type = "checkbox" name = "event_type" value = "學術">學術<br>
-          <input type = "checkbox" name = "event_type" value = "學藝">學藝<br>
-          <input type = "checkbox" name = "event_type" value = "康樂">康樂<br>
-          <input type = "checkbox" name = "event_type" value = "服務">服務<br>
-          <input type = "checkbox" name = "event_type" value = "體育">體育<br>
-          <input type = "checkbox" name = "event_type" value = "聯誼">聯誼<br>
-        </div>
-        </form>
+          </form>
+          <div>
+            <label>舉辦團體：<br></label>
+            <input type="checkbox" name="host_type" value="全部" onclick="toggleCheckboxes('host_type', '全部')" checked>全部<br>
+            <input type="checkbox" name="host_type" value="個人" onclick="toggleAllCheckbox('host_type')">個人<br>
+            <input type="checkbox" name="host_type" value="校內社團" onclick="toggleAllCheckbox('host_type')">校內社團<br>
+            <input type="checkbox" name="host_type" value="校內系所" onclick="toggleAllCheckbox('host_type')">校內系所<br>
+            <input type="checkbox" name="host_type" value="學校" onclick="toggleAllCheckbox('host_type')">學校<br>
+            <input type="checkbox" name="host_type" value="校外" onclick="toggleAllCheckbox('host_type')">校外<br>
+            <input type="checkbox" name="host_type" value="政府" onclick="toggleAllCheckbox('host_type')">政府<br>
+          </div>
+          <div>
+            <label>活動類型：<br></label>
+            <input type="checkbox" name="event_type" value="全部" onclick="toggleCheckboxes('event_type', '全部')" checked>全部<br>
+            <input type="checkbox" name="event_type" value="學系" onclick="toggleAllCheckbox('event_type')">學系<br>
+            <input type="checkbox" name="event_type" value="學術" onclick="toggleAllCheckbox('event_type')">學術<br>
+            <input type="checkbox" name="event_type" value="學藝" onclick="toggleAllCheckbox('event_type')">學藝<br>
+            <input type="checkbox" name="event_type" value="康樂" onclick="toggleAllCheckbox('event_type')">康樂<br>
+            <input type="checkbox" name="event_type" value="服務" onclick="toggleAllCheckbox('event_type')">服務<br>
+            <input type="checkbox" name="event_type" value="體育" onclick="toggleAllCheckbox('event_type')">體育<br>
+            <input type="checkbox" name="event_type" value="聯誼" onclick="toggleAllCheckbox('event_type')">聯誼<br>
+          </div>
       </div>
 	  </div>
     </div>
   </div>
-  <script >
+  <script>
     var level = '{{level}}';
     console.log(level);
     var block1 = document.getElementById('show1');
@@ -101,6 +98,24 @@
     }else if(level == "advanced"){
         block3.style.display = "none";
     }else if(level == "admin"){
+    }
+
+    function toggleCheckboxes(groupName, value) {
+      const checkboxes = document.querySelectorAll(`input[name=${groupName}]`);
+  
+      checkboxes.forEach(checkbox => {
+        if (checkbox.value !== value) {
+          checkbox.checked = false;
+        }
+      });
+    }
+  
+    function toggleAllCheckbox(groupName) {
+      const allCheckbox = document.querySelector(`input[name=${groupName}][value=全部]`);
+  
+      if (allCheckbox.checked) {
+        allCheckbox.checked = false;
+      }
     }
 
     document.getElementById('searchForm').addEventListener('submit', function(event) {
@@ -134,7 +149,7 @@
           <div>${title}</div>
           </a>
           `).join('');
-      
+
           document.getElementById('searchResultsContainer').innerHTML = titlesHTML;
          })
          .catch(error => console.error('錯誤:', error));

@@ -232,7 +232,7 @@
                     data.append(pair[0], pair[1]);
                 }
         
-                // 使用 Fetch API 发起 AJAX 请求
+                // 使用 Fetch API 發起 AJAX 請求
                 const create_url = {{ url_for("event_manage.create_event")|tojson }};
                 const response = await fetch(create_url, {
                     method: "POST",
