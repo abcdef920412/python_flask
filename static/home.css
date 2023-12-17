@@ -1,59 +1,85 @@
 body {
-    margin: 0;
-    padding: 0;
-  }
-  
-  .container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh; /* 100% 視窗高度 */
-  }
-  
-  .header {
-    background-color: rgb(48, 50, 58); /* 綠色背景，可自行調整顏色 */
-    color: white;
-    padding: 8px;
-  }
-  
-  .row {
-    display: flex;
-    justify-content: space-between; /* 將內容平均分布在行中 */
-    flex: 1; /* 充滿剩餘的高度 */
-  }
-  
-  .column {
-    flex: 1; /* 充滿剩餘的寬度 */
-    padding: 1em;
-    border: 1px solid #ddd; /* 加入邊框效果，可根據需要自行調整 */
-    box-sizing: border-box; /* 避免邊框影響寬度和高度計算 */
-  }
+  margin: 0;
+  padding: 0;
+}
 
-  .header a{
-    text-decoration: none;
-    float:right;
-    padding-top: 8px;
-    color:white;
-  }
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* 100% 視窗高度 */
+}
 
-  .column-1 a{
-    text-decoration: none;
-    color:black;
-  }
-  
-  .column-1 label{
-    font-weight: bolder;
-  }
-  
-  .column-1 label{
-    font-weight: bold;
-    font-size:large;
-  }
+.header {
+  background-color: rgb(48, 50, 58); /* 綠色背景，可自行調整顏色 */
+  color: white;
+  padding: 8px;
+}
 
-  .column-2 a:link,.column-2 a:visited {
-    color: black;
-    text-decoration: none;
-  }
+.row {
+  display: flex;
+  justify-content: space-between; /* 將內容平均分布在行中 */
+  flex: 1; /* 充滿剩餘的高度 */
+}
 
-  .column-2 a:hover,.column-2 a:active {
-    color: #3399CC;
-  }
+.column {
+  flex: 1; /* 充滿剩餘的寬度 */
+  padding: 1em;
+  border: 1px solid #ddd; /* 加入邊框效果，可根據需要自行調整 */
+  box-sizing: border-box; /* 避免邊框影響寬度和高度計算 */
+}
+
+.header a{
+  text-decoration: none;
+  float:right;
+  padding-top: 8px;
+  color:white;
+}
+
+.column-1 a{
+  text-decoration: none;
+  color:black;
+}
+
+.column-1 label{
+  font-weight: bolder;
+}
+
+.column-1 label{
+  font-weight: bold;
+  font-size:large;
+}
+
+.column-2 {
+  display: flex;
+  flex-wrap: wrap; /* 當子元素超出父元素時換行 */
+}
+
+.column-2 a:link,.column-2 a:visited {
+  color: black;
+  text-decoration: none;
+}
+
+.column-2 a:hover,.column-2 a:active {
+  color: #3399CC;
+}
+#searchResultsContainer li {
+  margin: 0 5px 10px;
+  width: 100%;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  height: auto;
+  margin-bottom: 10px;
+  padding: 0px 20px 10px 10px;
+  float: left;
+  background-color: #F1EFEB;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+li {
+  display: list-item;
+  text-align: -webkit-match-parent;
+}
+.floatRight{
+    float: right;
+}

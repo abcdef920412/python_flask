@@ -43,11 +43,23 @@
       </div>
       <div class="column">
         <div class="column-2" id="searchResultsContainer">
-        {% for number in range(num) %}
-          <a href="{{url_for('event_manage.event', event_id = _id[number])}}">
-          <div>{{title[number]}}</div>
-          </a>
-        {% endfor %}
+          {% for event in events %}
+          <li class="event_info">
+            <h4>
+                <a href="">{{event["activity_type"]}}</a>
+                <a href="">{{event["organizing_group"]}}</a>
+                <span class="floatRight">報名狀態：{{event["registration_status"]}}</span>
+            </h4>
+            <a href="{{ url_for('event_manage.event', event_id = event["_id"]) }}">
+                <h2>
+                    <div class="event_tilte">{{event["title"]}}</div>
+                </h2>
+                <p class="text">活動期間：<strong class="actTime">{{event["date_begin"]+ " ~ " + event["date_end"]}}</strong><br>
+                    <span class="floatRight">剩餘名額：<strong class="highLightedText">{{event["remaining_quota"]}}</strong></span>
+                </p>
+            </a>
+          </li>
+          {% endfor %}
       </div>
   </div>
       <div class="column">
@@ -144,13 +156,25 @@
             formElement.reset();
           }
           // 將搜索結果顯示在 searchResultsContainer 中
-          const titlesHTML = data.title.map((title, index) => `
-          <a href="event/${data._id[index]}">
-          <div>${title}</div>
-          </a>
+          const eventsHTML = data.events.map(event => `
+          <li class="event_info">
+              <h4>
+                  <a href="">${event.activity_type}</a>
+                  <a href="">${event.organizing_group}</a>
+                  <span class="floatRight">報名狀態：${event.registration_status}</span>
+              </h4>
+              <a href="/event_manage/event/${event._id}">
+                  <h2>
+                      <div class="event_tilte">${event.title}</div>
+                  </h2>
+                  <p class="text">活動期間：<strong class="actTime">${event.date_begin + " ~ " + event.date_end}</strong><br>
+                      <span class="floatRight">剩餘名額：<strong class="highLightedText">${event.remaining_quota}</strong></span>
+                  </p>
+              </a>
+          </li>
           `).join('');
 
-          document.getElementById('searchResultsContainer').innerHTML = titlesHTML;
+          document.getElementById('searchResultsContainer').innerHTML = eventsHTML;
          })
          .catch(error => console.error('錯誤:', error));
       });

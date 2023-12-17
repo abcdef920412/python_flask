@@ -10,20 +10,28 @@ def member():
         collection = db["events"]
         collection1 = db['users']
         name = session["username"]
-        cu = collection1.find(
+        users = collection1.find(
             {"username": name}
         )
-        for doc in cu:
-            level=doc['level']
-        cursor = collection.find()
-        event = []
-        event_id = []
-        num = 0
-        for doc in cursor:
-            event.append(doc["title"])
-            event_id.append(str(doc["_id"]))
-            num += 1
-        return render_template("home.html", username = name, title = event, _id = event_id, num = num,level=level)
+        for doc in users:
+            level = doc['level']
+        user_events = collection.find({})
+        event_data = [{
+        "_id": str(event["_id"]),
+        "title": event["title"],
+        "date_begin": event["date_begin"].split()[0], #取年月日
+        "date_end": event["date_end"].split()[0],
+        "organizing_group": event["tag"][0],
+        "activity_type": event["tag"][1],
+        "registration_status": "已報名" if name in event["member"] else "未報名",
+        "remaining_quota": event["limit_value"] - len(event["member"])
+        } 
+        for event in user_events]
+
+        return render_template("home.html",
+                               username = name, 
+                               events = event_data,
+                               level = level)
     else :
         return redirect(url_for('sign.index'))
 
@@ -36,6 +44,7 @@ def event(event_id):
     })
     if table == None:
         return redirect("/error?404")
+    
     title = table["title"]
     date_begin = table["date_begin"]
     date_end = table["date_end"]
@@ -72,7 +81,7 @@ def register_event(event_id):
                 return {'result' : 'isFull'}
         return {'result' : 'isRegistered'}
     else:
-        return redirect("/error")
+        return redirect(url_for('sign.index'))
 
 @event_manage_bp.route("/error")
 def error():
@@ -123,6 +132,7 @@ def create_event():
 
 @event_manage_bp.route("/search_event", methods = ["POST"])
 def search_event():
+    name = session["username"]
     event_name = request.form["q"]
     """可以收進階搜尋
     wtf = request.form.getlist("host_type")
@@ -133,27 +143,40 @@ def search_event():
     result = collection.find({
         "title": {"$regex": event_name}
     })
+    event_data = [{
+    "_id": str(event["_id"]),
+    "title": event["title"],
+    "date_begin": event["date_begin"].split()[0], #取年月日
+    "date_end": event["date_end"].split()[0],
+    "organizing_group": event["tag"][0],
+    "activity_type": event["tag"][1],
+    "registration_status": "已報名" if name in event["member"] else "未報名",
+    "remaining_quota": event["limit_value"] - len(event["member"])
+    } 
+    for event in result]
 
-    events = [{"_id": str(doc["_id"]), "title": doc["title"]} for doc in result]
-
-    if not events:
+    if not event_data:
         all_events = collection.find({})
-        all_events_list = [
-            {"_id": str(doc["_id"]), "title": doc["title"]} for doc in all_events
-        ]
+        all_events_list = [{
+        "_id": str(event["_id"]),
+        "title": event["title"],
+        "date_begin": event["date_begin"].split()[0], #取年月日
+        "date_end": event["date_end"].split()[0],
+        "organizing_group": event["tag"][0],
+        "activity_type": event["tag"][1],
+        "registration_status": "已報名" if name in event["member"] else "未報名",
+        "remaining_quota": event["limit_value"] - len(event["member"])
+        } 
+        for event in all_events]
 
         return {
             "result": "notFind",
-            "title": [event["title"] for event in all_events_list],
-            "num": len(all_events_list),
-            "_id": [event["_id"] for event in all_events_list],
+            "events": all_events_list
         }
 
     return {
         "result": "Find",
-        "title": [event["title"] for event in events],
-        "num": len(events),
-        "_id": [event["_id"] for event in events],
+        "events": event_data
     }
 
 @event_manage_bp.route("/delete_event/<event_id>")
