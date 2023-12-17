@@ -19,8 +19,8 @@ def member():
         event_data = [{
         "_id": str(event["_id"]),
         "title": event["title"],
-        "date_begin": event["date_begin"].split()[0], #取年月日
-        "date_end": event["date_end"].split()[0],
+        "date_begin": event["date_begin"].split("T")[0], #取年月日
+        "date_end": event["date_end"].split("T")[0],
         "organizing_group": event["tag"][0],
         "activity_type": event["tag"][1],
         "registration_status": "已報名" if name in event["member"] else "未報名",
@@ -97,9 +97,7 @@ def create_event():
     if "username" in session:
         title = request.form["title"]
         date_begin = request.form["date_begin"]
-        date_begin = date_begin.replace("T","  ") 
         date_end = request.form["date_end"]
-        date_end = date_end.replace("T","  ")
         location = request.form["location"]
         limit_value = int(request.form["limit_value"])
         description = request.form["description"]
@@ -146,8 +144,8 @@ def search_event():
     event_data = [{
     "_id": str(event["_id"]),
     "title": event["title"],
-    "date_begin": event["date_begin"].split()[0], #取年月日
-    "date_end": event["date_end"].split()[0],
+    "date_begin": event["date_begin"].split("T")[0], #取年月日
+    "date_end": event["date_end"].split("T")[0],
     "organizing_group": event["tag"][0],
     "activity_type": event["tag"][1],
     "registration_status": "已報名" if name in event["member"] else "未報名",
@@ -160,8 +158,8 @@ def search_event():
         all_events_list = [{
         "_id": str(event["_id"]),
         "title": event["title"],
-        "date_begin": event["date_begin"].split()[0], #取年月日
-        "date_end": event["date_end"].split()[0],
+        "date_begin": event["date_begin"].split("T")[0], #取年月日
+        "date_end": event["date_end"].split("T")[0],
         "organizing_group": event["tag"][0],
         "activity_type": event["tag"][1],
         "registration_status": "已報名" if name in event["member"] else "未報名",

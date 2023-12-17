@@ -51,9 +51,9 @@
             <h5 id="title" class="form-label">活動標題:</h5>
             <p>{{event_title}}</p>
             <h5 id="date_begin" class="form-label">活動開始日期:</h5>
-            <p>{{date_begin}}</p>
+            <p>{{date_begin.replace("T","  ")}}</p>
             <h5 id="date_end" class="form-label">活動結束日期:</h5>
-            <p>{{date_end}}</p>
+            <p>{{date_end.replace("T","  ")}}</p>
             <h5 id="event_location" class="form-label">活動地點:</h5>
             <p>{{event_location}}</p>
             <h5 id="event_description" class="form-label" >活動介紹:</h5>
