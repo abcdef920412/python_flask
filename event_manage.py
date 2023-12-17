@@ -99,16 +99,16 @@ def create_event():
         date_begin = request.form["date_begin"]
         date_begin = date_begin.replace("T","  ") 
         date_end = request.form["date_end"]
-        date_end = date_begin.replace("T","  ")
+        date_end = date_end.replace("T","  ")
         location = request.form["location"]
         limit_value = int(request.form["limit_value"])
         description = request.form["description"]
-        organizingGroup = request.form["organizingGroup"]
-        activityType = request.form["activityType"]
+        organizing_group = request.form["organizing_group"]
+        activity_type = request.form["activity_type"]
         requirement = request.form["identity"]
         host = session["username"]
         member = request.form.getlist("member")[:limit_value]
-        tag_values = [organizingGroup, activityType] # 根據設計文件皆為 tag
+        tag_values = [organizing_group, activity_type] # 根據設計文件皆為 tag
         
         collection = db["events"]
         result = collection.insert_one({
@@ -126,7 +126,7 @@ def create_event():
         if result.acknowledged:
             return {'result' : 'Success'}
         else:
-            {'result' : 'Faliure'}
+            return {'result' : 'Faliure'}
     else:
         return redirect(url_for('sign.index'))
 

@@ -258,7 +258,6 @@
                     Swal.fire({
                         icon: 'error',
                         title: '發生錯誤',
-                        text: '2 秒後跳轉頁面',
                         timer: 2000,
                         timerProgressBar: true,
                     });
@@ -267,8 +266,7 @@
                 console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
-                    title: '發生錯誤',
-                    text: '2 秒後跳轉頁面',
+                    title: '錯誤發生',
                     timer: 2000,
                     timerProgressBar: true,
                 });
