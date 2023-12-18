@@ -83,3 +83,7 @@ li {
 .floatRight{
     float: right;
 }
+#scrollbar {
+  max-height: 95vh;
+  overflow-y: auto;
+}

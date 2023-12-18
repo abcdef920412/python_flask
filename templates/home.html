@@ -44,7 +44,7 @@
             </div>
         </div>
       </div>
-      <div class="column">
+      <div class="column" id="scrollbar">
         <div class="column-2" id="searchResultsContainer">
           {% for event in events %}
           <li class="event_info">
@@ -64,8 +64,8 @@
             </a>
           </li>
           {% endfor %}
+        </div>
       </div>
-  </div>
       <div class="column">
         <div class="column-3">
           <form id="searchForm" action="{{ url_for('event_manage.search_event') }}" method="POST">
