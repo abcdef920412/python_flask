@@ -4,6 +4,28 @@ from db_conn import db
 
 event_manage_bp = Blueprint('event_manage', __name__)
 
+@event_manage_bp.route("/guest")
+def guest():        
+    collection = db["events"]
+    user_events = collection.find({})
+    event_data = [{
+    "_id": str(event["_id"]),
+    "title": event["title"],
+    "host": event["host"],
+    "date_begin": event["date_begin"].split("T")[0], #取年月日
+    "date_end": event["date_end"].split("T")[0],
+    "organizing_group": event["tag"][0],
+    "activity_type": event["tag"][1],
+    "registration_status": "未報名",
+    "remaining_quota": event["limit_value"] - len(event["member"])
+    } 
+    for event in user_events]
+
+    return render_template("home.html",
+                            username = "Guest", 
+                            events = event_data,
+                            level = "visitor")
+
 @event_manage_bp.route("/member")
 def member():
     if "username" in session:
@@ -34,7 +56,8 @@ def member():
                                events = event_data,
                                level = level)
     else :
-        return redirect(url_for('sign.index'))
+        #return redirect(url_for('sign.index'))
+        return guest()
 
 @event_manage_bp.route("/event/<event_id>")#顯示活動資訊
 def event(event_id):
