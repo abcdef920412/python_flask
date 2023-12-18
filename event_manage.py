@@ -163,7 +163,7 @@ def search_event():
             for event in event_data
             if current_time > datetime.fromisoformat(event["date_end"])
         ]
-    elif filter_value == "joinable":
+    elif filter_value == "attend" or filter_value == "joinable":
         event_data = [
             event
             for event in event_data

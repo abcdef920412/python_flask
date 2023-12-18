@@ -52,16 +52,22 @@ def end_event():
     else :
         return redirect(url_for('sign.index'))    
 
-@event_list_bp.route("/attend_event")#自己有報名的活動
+@event_list_bp.route("/attend_event")#自己有報名的活動，且未結束
 def attend_event():
     if "username" in session:
+        # 獲取當前主機時間
+        current_time = datetime.now()
         name = session["username"]
         level = find_user_level(name)
         search_criteria = {
             "member": {"$in": [name]}
         }
-        event_data = get_user_events(search_criteria)
-
+        event_data = [
+            event
+            for event in get_user_events(search_criteria)
+            if current_time <= datetime.fromisoformat(event["date_end"])
+        ]
+        
         return render_template("home.html",
                                username = name, 
                                events = event_data,
