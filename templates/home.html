@@ -20,8 +20,8 @@
           <div id = "show1">
           <label>查看活動</label> 
           <ul>
-            <li><a href="{{ url_for('event_list.attend_event') }}">查看已報名活動</a></li><br>
-            <li><a href="{{ url_for('event_list.end_event') }}">查看已結束活動</a></li>
+            <li><a href="{{ url_for('event_list.attend_event') }}">查看已報名的活動</a></li><br>
+            <li><a href="{{ url_for('event_list.end_event') }}">查看已結束的活動</a></li>
           </ul>
           <hr>
           </div>
@@ -29,6 +29,7 @@
           <label>活動管理</label>
           <ul>
           <li><a href="{{ url_for('event_manage.create') }}">新增活動</a></li><br>
+          <li><a href="{{ url_for('event_list.my_event') }}">查看已創建的活動</a></li>
           </ul>
           <hr>
           </div>
