@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
   <title>活動輕鬆報名</title>
 </head>
 <body>
-
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
   <div class="container">
     <div class="header">{{username}}
       <img src="{{ url_for('static', filename='head.png') }}" width="30" height="30">
@@ -19,8 +20,8 @@
           <div id = "show1">
           <label>查看活動</label> 
           <ul>
-            <li><a href="#">查看已參加活動</a></li><br>
-            <li><a href="#">查看已報名活動</a></li>
+            <li><a href="{{ url_for('event_list.attend_event') }}">查看已報名活動</a></li><br>
+            <li><a href="{{ url_for('event_list.end_event') }}">查看已參加活動</a></li>
           </ul>
           <hr>
           </div>
@@ -41,45 +42,60 @@
         </div>
       </div>
       <div class="column">
-        <div class="column-2">
-        {% for number in range(num) %}
-          <a href="{{url_for('event_manage.event', event_id = _id[number])}}">
-          <div>{{title[number]}}</div>
-          </a>
-        {% endfor %}
+        <div class="column-2" id="searchResultsContainer">
+          {% for event in events %}
+          <li class="event_info">
+            <h4>
+                <a href="">{{event["activity_type"]}}</a>
+                <a href="">{{event["organizing_group"]}}</a>
+                <span class="floatRight">報名狀態：{{event["registration_status"]}}</span>
+            </h4>
+            <a href="{{ url_for('event_manage.event', event_id = event["_id"]) }}">
+                <h2>
+                    <div class="event_tilte">{{event["title"]}}</div>
+                </h2>
+                <p class="text">活動期間：<strong class="actTime">{{event["date_begin"]+ " ~ " + event["date_end"]}}</strong><br>
+                    <span class="floatRight">剩餘名額：<strong class="highLightedText">{{event["remaining_quota"]}}</strong></span>
+                </p>
+            </a>
+          </li>
+          {% endfor %}
       </div>
   </div>
       <div class="column">
         <div class="column-3">
-        <form action="{{ url_for('event_manage.search_event') }}" method="POST">
+          <form id="searchForm" action="{{ url_for('event_manage.search_event') }}" method="POST">
           <label for="site-search">搜尋活動：</label>
           <input type="search" id="site-search" name="q" />
           <input type="submit" value = "搜尋" />
-        <div>
-          <label>舉辦團體：<br></label>
-          <input type = "checkbox" name = "host_type" value = "個人">個人<br>
-          <input type = "checkbox" name = "host_type" value = "校內社團">校內社團<br>
-          <input type = "checkbox" name = "host_type" value = "校內系所">校內系所<br>
-          <input type = "checkbox" name = "host_type" value = "學校">學校<br>
-          <input type = "checkbox" name = "host_type" value = "校外">校外<br>
-          <input type = "checkbox" name = "host_type" value = "政府">政府<br>
-        </div>
-        <div>
-          <label>活動類型：<br></label>
-          <input type = "checkbox" name = "event_type" value = "學系">學系<br>
-          <input type = "checkbox" name = "event_type" value = "學術">學術<br>
-          <input type = "checkbox" name = "event_type" value = "學藝">學藝<br>
-          <input type = "checkbox" name = "event_type" value = "康樂">康樂<br>
-          <input type = "checkbox" name = "event_type" value = "服務">服務<br>
-          <input type = "checkbox" name = "event_type" value = "體育">體育<br>
-          <input type = "checkbox" name = "event_type" value = "聯誼">聯誼<br>
-        </div>
-        </form>
+          </form>
+          <div>
+            <label>舉辦團體：<br></label>
+            <input type="checkbox" name="host_type" value="全部" onclick="toggleCheckboxes('host_type', '全部')" checked>全部<br>
+            <input type="checkbox" name="host_type" value="個人" onclick="toggleAllCheckbox('host_type')">個人<br>
+            <input type="checkbox" name="host_type" value="校內社團" onclick="toggleAllCheckbox('host_type')">校內社團<br>
+            <input type="checkbox" name="host_type" value="校內系所" onclick="toggleAllCheckbox('host_type')">校內系所<br>
+            <input type="checkbox" name="host_type" value="學校" onclick="toggleAllCheckbox('host_type')">學校<br>
+            <input type="checkbox" name="host_type" value="校外" onclick="toggleAllCheckbox('host_type')">校外<br>
+            <input type="checkbox" name="host_type" value="政府" onclick="toggleAllCheckbox('host_type')">政府<br>
+          </div>
+          <div>
+            <label>活動類型：<br></label>
+            <input type="checkbox" name="event_type" value="全部" onclick="toggleCheckboxes('event_type', '全部')" checked>全部<br>
+            <input type="checkbox" name="event_type" value="講座" onclick="toggleAllCheckbox('event_type')">講座<br>
+            <input type="checkbox" name="event_type" value="學系" onclick="toggleAllCheckbox('event_type')">學系<br>
+            <input type="checkbox" name="event_type" value="學術" onclick="toggleAllCheckbox('event_type')">學術<br>
+            <input type="checkbox" name="event_type" value="學藝" onclick="toggleAllCheckbox('event_type')">學藝<br>
+            <input type="checkbox" name="event_type" value="康樂" onclick="toggleAllCheckbox('event_type')">康樂<br>
+            <input type="checkbox" name="event_type" value="服務" onclick="toggleAllCheckbox('event_type')">服務<br>
+            <input type="checkbox" name="event_type" value="體育" onclick="toggleAllCheckbox('event_type')">體育<br>
+            <input type="checkbox" name="event_type" value="聯誼" onclick="toggleAllCheckbox('event_type')">聯誼<br>
+          </div>
       </div>
 	  </div>
     </div>
   </div>
-  <script >
+  <script>
     var level = '{{level}}';
     console.log(level);
     var block1 = document.getElementById('show1');
@@ -96,6 +112,74 @@
         block3.style.display = "none";
     }else if(level == "admin"){
     }
+
+    function toggleCheckboxes(groupName, value) {
+      const checkboxes = document.querySelectorAll(`input[name=${groupName}]`);
+  
+      checkboxes.forEach(checkbox => {
+        if (checkbox.value !== value) {
+          checkbox.checked = false;
+        }
+      });
+    }
+  
+    function toggleAllCheckbox(groupName) {
+      const allCheckbox = document.querySelector(`input[name=${groupName}][value=全部]`);
+  
+      if (allCheckbox.checked) {
+        allCheckbox.checked = false;
+      }
+    }
+
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent the default form submission
+      const formElement = event.target;
+      const data = new URLSearchParams();
+      for (const pair of new FormData(formElement)) {
+          data.append(pair[0], pair[1]);
+      }
+      // 使用 Fetch API 發起 AJAX 請求
+      const create_url = {{ url_for('event_manage.search_event')|tojson }}
+      fetch(create_url,{
+          method: "POST",
+          body: data
+      })
+      .then(response => response.json())
+         .then(data => {
+          if (data.result == 'notFind') {
+            Swal.fire({
+              icon: 'error',
+              title: '活動不存在',
+              timer: 2000,
+              timerProgressBar: true,
+            });
+            // 清空搜索字段
+            formElement.reset();
+          }
+          // 將搜索結果顯示在 searchResultsContainer 中
+          const eventsHTML = data.events.map(event => `
+          <li class="event_info">
+              <h4>
+                  <a href="">${event.activity_type}</a>
+                  <a href="">${event.organizing_group}</a>
+                  <span class="floatRight">報名狀態：${event.registration_status}</span>
+              </h4>
+              <a href="/event_manage/event/${event._id}">
+                  <h2>
+                      <div class="event_tilte">${event.title}</div>
+                  </h2>
+                  <p class="text">活動期間：<strong class="actTime">${event.date_begin + " ~ " + event.date_end}</strong><br>
+                      <span class="floatRight">剩餘名額：<strong class="highLightedText">${event.remaining_quota}</strong></span>
+                  </p>
+              </a>
+          </li>
+          `).join('');
+
+          document.getElementById('searchResultsContainer').innerHTML = eventsHTML;
+         })
+         .catch(error => console.error('錯誤:', error));
+      });
   </script>
+
 </body>
 </html>

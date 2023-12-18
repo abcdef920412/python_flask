@@ -10,20 +10,28 @@ def member():
         collection = db["events"]
         collection1 = db['users']
         name = session["username"]
-        cu = collection1.find(
+        users = collection1.find(
             {"username": name}
         )
-        for doc in cu:
-            level=doc['level']
-        cursor = collection.find()
-        event = []
-        event_id = []
-        num = 0
-        for doc in cursor:
-            event.append(doc["title"])
-            event_id.append(str(doc["_id"]))
-            num += 1
-        return render_template("home.html", username = name, title = event, _id = event_id, num = num,level=level)
+        for doc in users:
+            level = doc['level']
+        user_events = collection.find({})
+        event_data = [{
+        "_id": str(event["_id"]),
+        "title": event["title"],
+        "date_begin": event["date_begin"].split("T")[0], #取年月日
+        "date_end": event["date_end"].split("T")[0],
+        "organizing_group": event["tag"][0],
+        "activity_type": event["tag"][1],
+        "registration_status": "已報名" if name in event["member"] else "未報名",
+        "remaining_quota": event["limit_value"] - len(event["member"])
+        } 
+        for event in user_events]
+
+        return render_template("home.html",
+                               username = name, 
+                               events = event_data,
+                               level = level)
     else :
         return redirect(url_for('sign.index'))
 
@@ -36,6 +44,7 @@ def event(event_id):
     })
     if table == None:
         return redirect("/error?404")
+    
     title = table["title"]
     date_begin = table["date_begin"]
     date_end = table["date_end"]
@@ -72,7 +81,7 @@ def register_event(event_id):
                 return {'result' : 'isFull'}
         return {'result' : 'isRegistered'}
     else:
-        return redirect("/error")
+        return redirect(url_for('sign.index'))
 
 @event_manage_bp.route("/error")
 def error():
@@ -88,16 +97,17 @@ def create_event():
     if "username" in session:
         title = request.form["title"]
         date_begin = request.form["date_begin"]
-        date_begin = date_begin.replace("T","  ") 
         date_end = request.form["date_end"]
-        date_end = date_begin.replace("T","  ")
         location = request.form["location"]
         limit_value = int(request.form["limit_value"])
         description = request.form["description"]
+        organizing_group = request.form["organizing_group"]
+        activity_type = request.form["activity_type"]
+        requirement = request.form["identity"]
         host = session["username"]
         member = request.form.getlist("member")[:limit_value]
-        #tag = request.form["tag"]
-        #requirement = request.form["requirement"]
+        tag_values = [organizing_group, activity_type] # 根據設計文件皆為 tag
+        
         collection = db["events"]
         result = collection.insert_one({
             "title":title,
@@ -107,16 +117,16 @@ def create_event():
             "description":description,
             "host":host,
             "member":member,
-            "limit_value":limit_value
-            #"tag":tag,
-            #"requirement":requirement
+            "limit_value":limit_value,
+            "tag":tag_values,
+            "requirement":requirement
         })
         if result.acknowledged:
             return {'result' : 'Success'}
         else:
-            {'result' : 'Faliure'}
+            return {'result' : 'Faliure'}
     else:
-        return redirect("/error")
+        return redirect(url_for('sign.index'))
 
 @event_manage_bp.route("/search_event", methods = ["POST"])
 def search_event():
@@ -128,22 +138,44 @@ def search_event():
         print(wtffff)
     """
     collection = db["events"]
-    result = collection.find_one({
-        "title": { "$regex": event_name }
-    })
-    if result == None:
-        return redirect("/error?msg=找不到此活動")
-    num = 0
     result = collection.find({
-        "title": { "$regex": event_name }
+        "title": {"$regex": event_name}
     })
-    event = []
-    event_id= []
-    for doc in result:
-        num += 1
-        event_id.append(str(doc["_id"]))
-        event.append(doc["title"])
-    return render_template("home.html", username = name, title = event, num = num , _id = event_id)
+    event_data = [{
+    "_id": str(event["_id"]),
+    "title": event["title"],
+    "date_begin": event["date_begin"].split("T")[0], #取年月日
+    "date_end": event["date_end"].split("T")[0],
+    "organizing_group": event["tag"][0],
+    "activity_type": event["tag"][1],
+    "registration_status": "已報名" if name in event["member"] else "未報名",
+    "remaining_quota": event["limit_value"] - len(event["member"])
+    } 
+    for event in result]
+
+    if not event_data:
+        all_events = collection.find({})
+        all_events_list = [{
+        "_id": str(event["_id"]),
+        "title": event["title"],
+        "date_begin": event["date_begin"].split("T")[0], #取年月日
+        "date_end": event["date_end"].split("T")[0],
+        "organizing_group": event["tag"][0],
+        "activity_type": event["tag"][1],
+        "registration_status": "已報名" if name in event["member"] else "未報名",
+        "remaining_quota": event["limit_value"] - len(event["member"])
+        } 
+        for event in all_events]
+
+        return {
+            "result": "notFind",
+            "events": all_events_list
+        }
+
+    return {
+        "result": "Find",
+        "events": event_data
+    }
 
 @event_manage_bp.route("/delete_event/<event_id>")
 def delete_event(event_id):
