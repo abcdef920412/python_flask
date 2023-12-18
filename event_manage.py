@@ -19,6 +19,7 @@ def member():
         event_data = [{
         "_id": str(event["_id"]),
         "title": event["title"],
+        "host": event["host"],
         "date_begin": event["date_begin"].split("T")[0], #取年月日
         "date_end": event["date_end"].split("T")[0],
         "organizing_group": event["tag"][0],
@@ -35,7 +36,7 @@ def member():
     else :
         return redirect(url_for('sign.index'))
 
-@event_manage_bp.route("/event/<event_id>")
+@event_manage_bp.route("/event/<event_id>")#顯示活動資訊
 def event(event_id):
     #print(event_id)
     collection = db["events"]
@@ -63,7 +64,7 @@ def event(event_id):
                            registered_count = registered_count
                            )
 
-@event_manage_bp.route("/register_event/<event_id>")
+@event_manage_bp.route("/register_event/<event_id>")#報名活動
 def register_event(event_id):
     if "username" in session:
         username = session["username"]
@@ -144,6 +145,7 @@ def search_event():
     event_data = [{
     "_id": str(event["_id"]),
     "title": event["title"],
+    "host": event["host"],
     "date_begin": event["date_begin"].split("T")[0], #取年月日
     "date_end": event["date_end"].split("T")[0],
     "organizing_group": event["tag"][0],
@@ -158,6 +160,7 @@ def search_event():
         all_events_list = [{
         "_id": str(event["_id"]),
         "title": event["title"],
+        "host": event["host"],
         "date_begin": event["date_begin"].split("T")[0], #取年月日
         "date_end": event["date_end"].split("T")[0],
         "organizing_group": event["tag"][0],
