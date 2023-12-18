@@ -20,6 +20,7 @@ def attend_event():
         event_data = [{
         "_id": str(event["_id"]),
         "title": event["title"],
+        "host": event["host"],
         "date_begin": event["date_begin"].split("T")[0], #取年月日
         "date_end": event["date_end"].split("T")[0],
         "organizing_group": event["tag"][0],
@@ -55,6 +56,7 @@ def my_event():
         event_data = [{
         "_id": str(event["_id"]),
         "title": event["title"],
+        "host": event["host"],
         "date_begin": event["date_begin"].split("T")[0], #取年月日
         "date_end": event["date_end"].split("T")[0],
         "organizing_group": event["tag"][0],
@@ -91,6 +93,7 @@ def end_event():
         event_data = [{
         "_id": str(event["_id"]),
         "title": event["title"],
+        "host": event["host"],
         "date_begin": event["date_begin"].split("T")[0], #取年月日
         "date_end": event["date_end"].split("T")[0],
         "organizing_group": event["tag"][0],
