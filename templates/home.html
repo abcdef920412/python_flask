@@ -20,8 +20,11 @@
           <div id = "show1">
           <label>查看活動</label> 
           <ul>
-            <li><a href="{{ url_for('event_list.attend_event') }}">查看已報名活動</a></li><br>
-            <li><a href="{{ url_for('event_list.end_event') }}">查看已參加活動</a></li>
+            <li><a href="{{ url_for('event_manage.member') }}">所有活動</a></li><br>
+            <li><a href="{{ url_for('event_list.joinable_event') }}">可報名活動</a></li><br>
+            <li><a href="{{ url_for('event_list.end_event') }}">已結束活動</a></li><br>
+            <li><a href="{{ url_for('event_list.attend_event') }}">已報名活動</a></li><br>
+            <li><a href="{{ url_for('event_list.user_ended_event') }}">已參加活動</a></li>
           </ul>
           <hr>
           </div>
@@ -29,7 +32,7 @@
           <label>活動管理</label>
           <ul>
           <li><a href="{{ url_for('event_manage.create') }}">新增活動</a></li><br>
-          <li><a href="#">刪除活動</a></li>
+          <li><a href="{{ url_for('event_list.my_event') }}">查看自己創建的活動</a></li>
           </ul>
           <hr>
           </div>
@@ -46,6 +49,7 @@
           {% for event in events %}
           <li class="event_info">
             <h4>
+                <a href="">{{event["requirement"]}}</a>
                 <a href="">{{event["activity_type"]}}</a>
                 <a href="">{{event["organizing_group"]}}</a>
                 <span class="floatRight">報名狀態：{{event["registration_status"]}}</span>
@@ -54,7 +58,7 @@
                 <h2>
                     <div class="event_tilte">{{event["title"]}}</div>
                 </h2>
-                <p class="text">活動期間：<strong class="actTime">{{event["date_begin"]+ " ~ " + event["date_end"]}}</strong><br>
+                <p class="text">活動期間：<strong class="actTime">{{event["date_begin"].split("T")[0]+ " ~ " + event["date_end"].split("T")[0]}}</strong><br>
                     <span class="floatRight">剩餘名額：<strong class="highLightedText">{{event["remaining_quota"]}}</strong></span>
                 </p>
             </a>
@@ -66,7 +70,7 @@
         <div class="column-3">
           <form id="searchForm" action="{{ url_for('event_manage.search_event') }}" method="POST">
           <label for="site-search">搜尋活動：</label>
-          <input type="search" id="site-search" name="q" />
+          <input type="search" id="site-search" name="q"/>
           <input type="submit" value = "搜尋" />
           </form>
           <div>
@@ -138,6 +142,25 @@
       for (const pair of new FormData(formElement)) {
           data.append(pair[0], pair[1]);
       }
+      // 根據不同的路由生成相應的 filter 值
+      const currentPath = window.location.pathname;
+      let filterValue;
+      if (currentPath.includes('/user_ended_event')) {
+          filterValue = 'myend';
+      } else if (currentPath.includes('/my_event')) {
+          filterValue = 'my';
+      } else if (currentPath.includes('/attend_event')) {
+          filterValue = 'attend';
+      } else if (currentPath.includes('/joinable_event')) {
+          filterValue = 'joinable';
+      } else if (currentPath.includes('/end_event')) {
+          filterValue = 'end';
+      } else {
+          filterValue = 'default';
+      }
+      // 添加 filter 參數
+      data.append('filter', filterValue);
+
       // 使用 Fetch API 發起 AJAX 請求
       const create_url = {{ url_for('event_manage.search_event')|tojson }}
       fetch(create_url,{
@@ -145,37 +168,51 @@
           body: data
       })
       .then(response => response.json())
-         .then(data => {
+      .then(data => {
           if (data.result == 'notFind') {
+            const searchQuery = document.querySelector('[name="q"]').value;
             Swal.fire({
               icon: 'error',
-              title: '活動不存在',
+              title: `找不到符合條件的活動：${searchQuery}`,
+              text: '2 秒後重整頁面',
               timer: 2000,
-              timerProgressBar: true,
+              timerProgressBar: true
             });
             // 清空搜索字段
             formElement.reset();
-          }
-          // 將搜索結果顯示在 searchResultsContainer 中
-          const eventsHTML = data.events.map(event => `
-          <li class="event_info">
-              <h4>
-                  <a href="">${event.activity_type}</a>
-                  <a href="">${event.organizing_group}</a>
-                  <span class="floatRight">報名狀態：${event.registration_status}</span>
-              </h4>
-              <a href="/event_manage/event/${event._id}">
-                  <h2>
-                      <div class="event_tilte">${event.title}</div>
-                  </h2>
-                  <p class="text">活動期間：<strong class="actTime">${event.date_begin + " ~ " + event.date_end}</strong><br>
-                      <span class="floatRight">剩餘名額：<strong class="highLightedText">${event.remaining_quota}</strong></span>
-                  </p>
-              </a>
-          </li>
-          `).join('');
+            document.getElementById('searchResultsContainer').innerHTML = '';
+            setTimeout(function () {
+              location.reload();
+            }, 2000);
+          }else{
+            // 將搜索結果顯示在 searchResultsContainer 中
+            const eventsHTML = data.events.map(event => {
+            const dateBegin = event.date_begin.split("T")[0];
+            const dateEnd = event.date_end.split("T")[0];
+            const dateRange = `${dateBegin} ~ ${dateEnd}`;
+        
+            return `
+                <li class="event_info">
+                    <h4>
+                        <a href="">${event.requirement}</a>
+                        <a href="">${event.activity_type}</a>
+                        <a href="">${event.organizing_group}</a>
+                        <span class="floatRight">報名狀態：${event.registration_status}</span>
+                    </h4>
+                    <a href="/event_manage/event/${event._id}">
+                        <h2>
+                            <div class="event_tilte">${event.title}</div>
+                        </h2>
+                        <p class="text">活動期間：<strong class="actTime">${dateRange}</strong><br>
+                            <span class="floatRight">剩餘名額：<strong class="highLightedText">${event.remaining_quota}</strong></span>
+                        </p>
+                    </a>
+                </li>
+            `;
+            }).join('');
 
           document.getElementById('searchResultsContainer').innerHTML = eventsHTML;
+          }
          })
          .catch(error => console.error('錯誤:', error));
       });

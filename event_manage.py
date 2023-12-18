@@ -1,37 +1,25 @@
 from flask import Blueprint, render_template, redirect, url_for, request, session
 from bson import ObjectId
+from datetime import datetime
 from db_conn import db
+from event_function import get_user_events, find_user_identity
 
 event_manage_bp = Blueprint('event_manage', __name__)
 
 @event_manage_bp.route("/member")
 def member():
     if "username" in session:
-        collection = db["events"]
-        collection1 = db['users']
+        collection = db['users']
         name = session["username"]
-        users = collection1.find(
+        user = collection.find_one(
             {"username": name}
         )
-        for doc in users:
-            level = doc['level']
-        user_events = collection.find({})
-        event_data = [{
-        "_id": str(event["_id"]),
-        "title": event["title"],
-        "date_begin": event["date_begin"].split("T")[0], #取年月日
-        "date_end": event["date_end"].split("T")[0],
-        "organizing_group": event["tag"][0],
-        "activity_type": event["tag"][1],
-        "registration_status": "已報名" if name in event["member"] else "未報名",
-        "remaining_quota": event["limit_value"] - len(event["member"])
-        } 
-        for event in user_events]
+        event_data = get_user_events({})
 
         return render_template("home.html",
                                username = name, 
                                events = event_data,
-                               level = level)
+                               level = user["level"])
     else :
         return redirect(url_for('sign.index'))
 
@@ -39,29 +27,35 @@ def member():
 def event(event_id):
     #print(event_id)
     collection = db["events"]
+    collection1 = db['users']
+    name = session["username"]
+    user = collection1.find_one(
+        {"username": name}
+    )
     table =  collection.find_one({
         "_id" : ObjectId(event_id) 
     })
     if table == None:
-        return redirect("/error?404")
+        return redirect(url_for('event_manage.member'))
     
-    title = table["title"]
-    date_begin = table["date_begin"]
-    date_end = table["date_end"]
-    location = table["location"]
-    description = table["description"]
-    limit_value = table["limit_value"]
-    registered_count = len(table["member"])
-    return render_template("event.html",
-                           event_id = event_id, 
-                           event_title = title, 
-                           date_begin = date_begin, 
-                           date_end = date_end , 
-                           event_location = location, 
-                           event_description = description,
-                           limit_value = limit_value,
-                           registered_count = registered_count
-                           )
+    if user["level"] == "advanced" or name == table["host"]:
+        member = table["member"]
+    else:
+        member = []
+    
+    event_data = [{
+        "title": table["title"],
+        "date_begin": table["date_begin"],
+        "date_end": table["date_end"],
+        "location": table["location"],
+        "description": table["description"],
+        "limit_value": table["limit_value"],
+        "registered_count": len(table["member"]),
+        "member": member,
+        "organizing_group": table["tag"][0],
+        "activity_type": table["tag"][1],
+        }]
+    return render_template("event.html", events = event_data)
 
 @event_manage_bp.route("/register_event/<event_id>")
 def register_event(event_id):
@@ -133,45 +127,53 @@ def search_event():
     name = session["username"]
     event_name = request.form["q"]
     """可以收進階搜尋
-    wtf = request.form.getlist("host_type")
     for wtffff in wtf:
         print(wtffff)
     """
-    collection = db["events"]
-    result = collection.find({
+    filter_value = request.form["filter"]
+    # 初始化 search_criteria，設置通用條件
+    search_criteria = {
         "title": {"$regex": event_name}
-    })
-    event_data = [{
-    "_id": str(event["_id"]),
-    "title": event["title"],
-    "date_begin": event["date_begin"].split("T")[0], #取年月日
-    "date_end": event["date_end"].split("T")[0],
-    "organizing_group": event["tag"][0],
-    "activity_type": event["tag"][1],
-    "registration_status": "已報名" if name in event["member"] else "未報名",
-    "remaining_quota": event["limit_value"] - len(event["member"])
-    } 
-    for event in result]
+    }
 
-    if not event_data:
-        all_events = collection.find({})
-        all_events_list = [{
-        "_id": str(event["_id"]),
-        "title": event["title"],
-        "date_begin": event["date_begin"].split("T")[0], #取年月日
-        "date_end": event["date_end"].split("T")[0],
-        "organizing_group": event["tag"][0],
-        "activity_type": event["tag"][1],
-        "registration_status": "已報名" if name in event["member"] else "未報名",
-        "remaining_quota": event["limit_value"] - len(event["member"])
-        } 
-        for event in all_events]
+    # 根據不同的 filter 值修改 search_criteria
+    if filter_value == "attend" or filter_value == "myend":
+        search_criteria["member"] = {"$in": [name]}
+    elif filter_value == "joinable":
+        identity = find_user_identity(name)
+        search_criteria.update({ #未報名且符合資格
+        "$and": [
+            {"member": {"$nin": [name]}},
+            {"requirement": {"$in": [identity, "all"]}}
+        ]})
+    elif filter_value == "my":
+        search_criteria["host"] = name
 
+    event_data = get_user_events(search_criteria)
+
+    if not event_data: # 因為關鍵字而導致的 notFind
         return {
             "result": "notFind",
-            "events": all_events_list
+            "events": ""
         }
-
+    current_time = datetime.now()
+    if filter_value == "myend" or filter_value == "end":
+        event_data = [
+            event
+            for event in event_data
+            if current_time > datetime.fromisoformat(event["date_end"])
+        ]
+    elif filter_value == "joinable":
+        event_data = [
+            event
+            for event in event_data
+            if current_time <= datetime.fromisoformat(event["date_end"])
+        ]
+    if not event_data: # 因為時間限制而導致的 notFind
+        return {
+            "result": "notFind",
+            "events": ""
+        }
     return {
         "result": "Find",
         "events": event_data
