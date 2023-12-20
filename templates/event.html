@@ -51,26 +51,43 @@
     
     <div class="container">
         <div class="section1">
+            {% for event in events %}
             <h2>查看活動</h2>
             <h5 id="title" class="form-label">活動標題:</h5>
-            <p>{{event_title}}</p>
+            <p>{{event["title"]}}</p>
             <h5 id="date_begin" class="form-label">活動開始日期:</h5>
-            <p>{{date_begin.replace("T","  ")}}</p>
+            <p><pre>{{event["date_begin"].replace("T","   ")}}</pre></p>
             <h5 id="date_end" class="form-label">活動結束日期:</h5>
-            <p>{{date_end.replace("T","  ")}}</p>
+            <p><pre>{{event["date_end"].replace("T","   ")}}</pre></p>
             <h5 id="event_location" class="form-label">活動地點:</h5>
-            <p>{{event_location}}</p>
+            <p>{{event["location"]}}</p>
             <h5 id="event_description" class="form-label" >活動介紹:</h5>
-            <p><pre>{{event_description}}</pre></p>
+            <p><pre>{{event["description"]}}</pre></p>
             <h5 id="event_description" class="form-label" >人數限制:</h5>
-            <p>{{limit_value}}</p>
+            <p>{{event["limit_value"]}}</p>
             <h5 id="event_description" class="form-label" >尚餘名額:</h5>
-            <p>{{limit_value - registered_count}}</p>
+            <p>{{event["limit_value"] - event["registered_count"]}}</p>
+            <h5 id="memberInfo" class="form-label" >報名成員:</h5>
+                {% if event["member"] %}
+                    {% for member in event["member"] %}
+                    <p>{{member}}</p>
+                    {% endfor %}
+                {% else %}
+                    <p>尚無報名成員</p>
+                {% endif %}
+            {% endfor %}
             <button id="registration" class="btn btn-primary">報名</button>
             <button id="deletion" class="btn btn-primary">刪除</button>
         </div>
     </div>
     <script>
+        var memberInfo = document.getElementById("memberInfo").textContent;
+            if (memberInfo.trim() === "") {
+                // 如果 member 是空字串，隱藏相關元素
+                document.getElementById("registration").style.display = "none";
+                document.getElementById("deletion").style.display = "none";
+            }
+
         var registrationButton = document.getElementById('registration');
         registrationButton.addEventListener('click', function () {  
             // 使用 Fetch API 發起 AJAX 請求
