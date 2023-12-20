@@ -10,18 +10,26 @@
 <body>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
   <div class="container">
-    <div class="header">{{username}}
+    <div class="header" id = 'show0'>
+      <a href="{{ url_for('sign.index') }}">登入</a>
+    </div>
+    <div class="header" id = 'show4'>
+      {{username}}
       <img src="{{ url_for('static', filename='head.png') }}" width="30" height="30">
-      <a href="{{ url_for('sign.signout') }}">登出</a>
+      <a href="{{ url_for('event_manage.guest') }}">登出</a>
     </div>
     <div class="row">
       <div class="column">
         <div class="column-1">
           <div id = "show1">
+          <form id="goBack" action="{{ url_for('event_manage.member') }}">
+            <input type="submit" value = "返回主頁" />
+          </form>
+          <hr>
           <label>查看活動</label> 
           <ul>
-            <li><a href="{{ url_for('event_list.attend_event') }}">查看已報名活動</a></li><br>
-            <li><a href="{{ url_for('event_list.end_event') }}">查看已參加活動</a></li>
+            <li><a href="{{ url_for('event_list.attend_event') }}">查看已報名的活動</a></li><br>
+            <li><a href="{{ url_for('event_list.end_event') }}">查看已結束的活動</a></li>
           </ul>
           <hr>
           </div>
@@ -29,7 +37,7 @@
           <label>活動管理</label>
           <ul>
           <li><a href="{{ url_for('event_manage.create') }}">新增活動</a></li><br>
-          <li><a href="#">刪除活動</a></li>
+          <li><a href="{{ url_for('event_list.my_event') }}">查看已創建的活動</a></li>
           </ul>
           <hr>
           </div>
@@ -38,7 +46,7 @@
           <ul>
             <li><a href="{{ url_for('account_manage.getUserdata') }}">帳號管理</a></li>
             </ul>
-            </div>
+          </div>
         </div>
       </div>
       <div class="column">
@@ -54,6 +62,7 @@
                 <h2>
                     <div class="event_tilte">{{event["title"]}}</div>
                 </h2>
+                <h3>主辦人：{{event["host"]}}</h3>
                 <p class="text">活動期間：<strong class="actTime">{{event["date_begin"]+ " ~ " + event["date_end"]}}</strong><br>
                     <span class="floatRight">剩餘名額：<strong class="highLightedText">{{event["remaining_quota"]}}</strong></span>
                 </p>
@@ -98,19 +107,25 @@
   <script>
     var level = '{{level}}';
     console.log(level);
+    var block0 = document.getElementById('show0');
     var block1 = document.getElementById('show1');
     var block2 = document.getElementById('show2');
     var block3 = document.getElementById('show3');
+    var block4 = document.getElementById('show4');
     if(level == "visitor"){
         block1.style.display = "none";
         block2.style.display = "none";
         block3.style.display = "none";
+        block4.style.display = "none";
      }else if(level == "normal"){
+        block0.style.display = "none";
         block2.style.display = "none";
         block3.style.display = "none";
     }else if(level == "advanced"){
+        block0.style.display = "none";
         block3.style.display = "none";
     }else if(level == "admin"){
+        block0.style.display = "none";
     }
 
     function toggleCheckboxes(groupName, value) {
