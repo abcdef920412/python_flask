@@ -61,7 +61,6 @@ def event(event_id):
         member = []
     
     event_data = [{
-        "event_id": event_id,
         "title": table["title"],
         "date_begin": table["date_begin"],
         "date_end": table["date_end"],
@@ -73,7 +72,7 @@ def event(event_id):
         "organizing_group": table["tag"][0],
         "activity_type": table["tag"][1],
         }]
-    return render_template("event.html", events = event_data)
+    return render_template("event.html", events = event_data, event_id = event_id)
 
 @event_manage_bp.route("/register_event/<event_id>")#報名活動
 def register_event(event_id):
