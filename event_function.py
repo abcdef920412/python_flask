@@ -1,5 +1,6 @@
 from db_conn import db
 from flask import session
+from time import gmtime, strftime
 
 def get_user_events(search_criteria):
     collection = db["events"]
@@ -9,6 +10,7 @@ def get_user_events(search_criteria):
         {
             "_id": str(event["_id"]),
             "title": event["title"],
+            "host": event["host"],
             "date_begin": event["date_begin"], #取年月日
             "date_end": event["date_end"],
             "requirement": event["requirement"],
@@ -33,3 +35,13 @@ def find_user_identity(username):
         {"username": username}
     )
     return user["identity"]
+
+def time_compare(data, mod):
+    now = strftime("%Y-%m-%d  %H:%M", gmtime())
+    new_data = []
+    for x in data:
+        if x["date_end"] > now and mod == 1:#attend_event(started + not start)
+            new_data.append(x)
+        if x["date_end"] < now and mod == 2:#end_event
+            new_data.append(x)
+    return new_data

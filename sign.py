@@ -54,7 +54,7 @@ def signin():
     if result == None:
         return redirect("/error?msg=帳號密碼輸入錯誤或是你被ban了")
     session["username"] = result["username"]
-    print(session)
+    #print(session)
     return redirect(url_for('event_manage.member'))
 
 @sign_bp.route("/signout")

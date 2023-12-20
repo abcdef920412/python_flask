@@ -6,6 +6,18 @@ from event_function import get_user_events, find_user_identity
 
 event_manage_bp = Blueprint('event_manage', __name__)
 
+@event_manage_bp.route("/guest")
+def guest():        
+    event_data = [
+        event
+        for event in get_user_events({})
+    ]
+
+    return render_template("home.html",
+                            username = "Guest", 
+                            events = event_data,
+                            level = "visitor")
+
 @event_manage_bp.route("/member")
 def member():
     if "username" in session:
@@ -14,16 +26,21 @@ def member():
         user = collection.find_one(
             {"username": name}
         )
-        event_data = get_user_events({})
+        event_data = [
+        event
+        for event in get_user_events({})
+        ]
+
 
         return render_template("home.html",
                                username = name, 
                                events = event_data,
                                level = user["level"])
     else :
-        return redirect(url_for('sign.index'))
+        #return redirect(url_for('sign.index'))
+        return guest()
 
-@event_manage_bp.route("/event/<event_id>")
+@event_manage_bp.route("/event/<event_id>")#顯示活動資訊
 def event(event_id):
     #print(event_id)
     collection = db["events"]
@@ -57,7 +74,7 @@ def event(event_id):
         }]
     return render_template("event.html", events = event_data)
 
-@event_manage_bp.route("/register_event/<event_id>")
+@event_manage_bp.route("/register_event/<event_id>")#報名活動
 def register_event(event_id):
     if "username" in session:
         username = session["username"]
