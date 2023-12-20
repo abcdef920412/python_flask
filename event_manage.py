@@ -61,6 +61,7 @@ def event(event_id):
         member = []
     
     event_data = [{
+        "event_id": event_id,
         "title": table["title"],
         "date_begin": table["date_begin"],
         "date_end": table["date_end"],

@@ -81,13 +81,6 @@
         </div>
     </div>
     <script>
-        var memberInfo = document.getElementById("memberInfo").textContent;
-            if (memberInfo.trim() === "") {
-                // 如果 member 是空字串，隱藏相關元素
-                document.getElementById("registration").style.display = "none";
-                document.getElementById("deletion").style.display = "none";
-            }
-
         var registrationButton = document.getElementById('registration');
         registrationButton.addEventListener('click', function () {  
             // 使用 Fetch API 發起 AJAX 請求
