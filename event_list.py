@@ -5,7 +5,7 @@ from event_function import get_user_events, find_user_level, find_user_identity
 
 event_list_bp = Blueprint('event_list', __name__)
 
-@event_list_bp.route("/joinable_event")
+@event_list_bp.route("/joinable_event")#未報名且符合資格，尚可報名的活動
 def joinable_event():
     if "username" in session:
         # 獲取當前主機時間
@@ -31,7 +31,7 @@ def joinable_event():
     else :
         return redirect(url_for('sign.index'))
 
-@event_list_bp.route("/end_event")
+@event_list_bp.route("/end_event")#所有已經結束的活動
 def end_event():
     if "username" in session:
         # 獲取當前主機時間
@@ -52,7 +52,7 @@ def end_event():
     else :
         return redirect(url_for('sign.index'))    
 
-@event_list_bp.route("/attend_event")#自己有報名的活動，且未結束
+@event_list_bp.route("/attend_event")#自己有報名的活動，且活動未結束
 def attend_event():
     if "username" in session:
         # 獲取當前主機時間
