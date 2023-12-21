@@ -2,15 +2,17 @@ from flask import Blueprint, render_template, redirect, url_for, request, sessio
 from bson import ObjectId
 from datetime import datetime
 from db_conn import db
-from event_function import get_user_events, find_user_identity
+from event_function import get_user_events, find_user_identity, find_user_level
 
 event_manage_bp = Blueprint('event_manage', __name__)
 
 @event_manage_bp.route("/guest")
-def guest():        
+def guest():
+    if session.get("username"): # 如果有則刪除
+        del session["username"]
     event_data = [
         event
-        for event in get_user_events({})
+        for event in get_user_events("", {})
     ]
 
     return render_template("home.html",
@@ -28,9 +30,8 @@ def member():
         )
         event_data = [
         event
-        for event in get_user_events({})
+        for event in get_user_events(name, {})
         ]
-
 
         return render_template("home.html",
                                username = name, 
@@ -42,24 +43,29 @@ def member():
 
 @event_manage_bp.route("/event/<event_id>")#顯示活動資訊
 def event(event_id):
-    #print(event_id)
     collection = db["events"]
-    collection1 = db['users']
-    name = session["username"]
-    user = collection1.find_one(
-        {"username": name}
-    )
     table =  collection.find_one({
-        "_id" : ObjectId(event_id) 
-    })
+            "_id" : ObjectId(event_id) 
+        })
     if table == None:
         return redirect(url_for('event_manage.member'))
-    
-    if user["level"] == "advanced" or name == table["host"]:
-        member = table["member"]
+    member = []
+    if "username" in session : #登入狀態
+        #print(event_id)
+        collection1 = db['users']
+        name = session["username"]
+        user = collection1.find_one(
+            {"username": name}
+        )
+        #只有系統管理員或該活動主辦人可調閱 member 資料
+        level = user["level"]
+        if level == "advanced" or name == table["host"]: 
+            member = table["member"]
     else:
-        member = []
-    
+        name = "Guest"
+        level = "visitor"
+    #print(name, level)
+
     event_data = [{
         "title": table["title"],
         "date_begin": table["date_begin"],
@@ -68,11 +74,16 @@ def event(event_id):
         "description": table["description"],
         "limit_value": table["limit_value"],
         "registered_count": len(table["member"]),
-        "member": member,
         "organizing_group": table["tag"][0],
         "activity_type": table["tag"][1],
         }]
-    return render_template("event.html", events = event_data, event_id = event_id)
+    return render_template("event.html",
+                           name = name,
+                           events = event_data,
+                           event_id = event_id,
+                           level = level,
+                           host = table["host"],
+                           members = member)
 
 @event_manage_bp.route("/register_event/<event_id>")#報名活動
 def register_event(event_id):
@@ -81,6 +92,10 @@ def register_event(event_id):
         collection = db["events"]
         filter = {"_id" : ObjectId(event_id)}
         table = collection.find_one(filter)
+        if datetime.now() > datetime.fromisoformat(event["date_end"]):
+            return {'result' : 'registrationClosed'}
+        if table["requirement"] not in [find_user_identity(username), "all"]:
+            return {'result' : 'invalid_identity'}
         if username not in table["member"]:
             limit = table["limit_value"]
             registered_count = len(table["member"])
@@ -106,6 +121,8 @@ def create():
 @event_manage_bp.route("/create_event", methods=["POST"])
 def create_event():
     if "username" in session:
+        if find_user_level(session["username"]) not in ["advanced", "admin"]:
+            return redirect(url_for('sign.index'))
         title = request.form["title"]
         date_begin = request.form["date_begin"]
         date_end = request.form["date_end"]
@@ -166,7 +183,7 @@ def search_event():
     elif filter_value == "my":
         search_criteria["host"] = name
 
-    event_data = get_user_events(search_criteria)
+    event_data = get_user_events(name, search_criteria)
 
     if not event_data: # 因為關鍵字而導致的 notFind
         return {
@@ -199,10 +216,14 @@ def search_event():
 @event_manage_bp.route("/delete_event/<event_id>")
 def delete_event(event_id):
     if "username" in session:
+        if find_user_level(session["username"]) not in ["advanced", "admin"]:
+            return redirect(url_for('sign.index'))
         collection = db["events"]
         filter = {"_id" : ObjectId(event_id)}
         target = collection.find_one(filter)
         if target != None:
+            if target["host"] != session["username"]:
+                return {'result' : 'UnAuthorized'}
             collection.delete_one(filter)
             return {'result' : 'Success'}
         return {'result' : 'Notfound'}
