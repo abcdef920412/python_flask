@@ -91,14 +91,14 @@ def register_event(event_id):
         username = session["username"]
         collection = db["events"]
         filter = {"_id" : ObjectId(event_id)}
-        table = collection.find_one(filter)
+        event = collection.find_one(filter)
         if datetime.now() > datetime.fromisoformat(event["date_end"]):
             return {'result' : 'registrationClosed'}
-        if table["requirement"] not in [find_user_identity(username), "all"]:
+        if event["requirement"] not in [find_user_identity(username), "all"]:
             return {'result' : 'invalid_identity'}
-        if username not in table["member"]:
-            limit = table["limit_value"]
-            registered_count = len(table["member"])
+        if username not in event["member"]:
+            limit = event["limit_value"]
+            registered_count = len(event["member"])
             if limit > registered_count:
                 newvalue = {"$push": {"member": username}}
                 collection.update_one(filter, newvalue)
@@ -158,7 +158,10 @@ def create_event():
 
 @event_manage_bp.route("/search_event", methods = ["POST"])
 def search_event():
-    name = session["username"]
+    if session.get("username"):
+        name = session["username"]
+    else:
+        name = ""
     event_name = request.form["q"]
     """可以收進階搜尋
     for wtffff in wtf:
