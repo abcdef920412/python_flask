@@ -122,7 +122,7 @@ def create():
 def create_event():
     if "username" in session:
         if find_user_level(session["username"]) not in ["advanced", "admin"]:
-            return redirect(url_for('sign.index'))
+            return {'result' : 'UnAuthorized'}
         title = request.form["title"]
         date_begin = request.form["date_begin"]
         date_end = request.form["date_end"]
