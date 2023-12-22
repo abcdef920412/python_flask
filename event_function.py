@@ -1,10 +1,8 @@
 from db_conn import db
-from flask import session
 from time import gmtime, strftime
 
-def get_user_events(search_criteria):
+def get_user_events(name, search_criteria):
     collection = db["events"]
-    name = session["username"]
     user_events = collection.find(search_criteria)
     return [
         {
