@@ -2,9 +2,9 @@ from db_conn import db
 from flask import session
 from time import gmtime, strftime
 
-def get_user_events(search_criteria):
+def get_user_events(search_criteria, guest):
     collection = db["events"]
-    name = session["username"]
+    #name = session["username"]
     user_events = collection.find(search_criteria)
     return [
         {
@@ -16,7 +16,7 @@ def get_user_events(search_criteria):
             "requirement": event["requirement"],
             "organizing_group": event["tag"][0],
             "activity_type": event["tag"][1],
-            "registration_status": "已報名" if name in event["member"] else "未報名",
+            "registration_status": "已報名" if guest == False and session["name"] in event["member"] else "未報名",
             "remaining_quota": event["limit_value"] - len(event["member"])
         }
         for event in user_events

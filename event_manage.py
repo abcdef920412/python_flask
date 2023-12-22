@@ -10,7 +10,7 @@ event_manage_bp = Blueprint('event_manage', __name__)
 def guest():        
     event_data = [
         event
-        for event in get_user_events({})
+        for event in get_user_events({}, True)
     ]
 
     return render_template("home.html",
@@ -28,7 +28,7 @@ def member():
         )
         event_data = [
         event
-        for event in get_user_events({})
+        for event in get_user_events({}, False)
         ]
 
 
@@ -62,6 +62,7 @@ def event(event_id):
     
     event_data = [{
         "title": table["title"],
+        "host": table["host"],
         "date_begin": table["date_begin"],
         "date_end": table["date_end"],
         "location": table["location"],
