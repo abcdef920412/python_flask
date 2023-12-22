@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, redirect, url_for, session
-from db_conn import db
 from event_function import get_user_events, find_user_level, find_user_identity, time_compare
 
 #from datetime import datetime
@@ -18,7 +17,7 @@ def attend_event():
         }
         event_data = [
             event
-            for event in get_user_events(search_criteria)
+            for event in get_user_events(name, search_criteria)
             #if current_time <= datetime.fromisoformat(event["date_end"])
         ]
         event_data = time_compare(event_data, 1)#mod = 1
@@ -38,7 +37,7 @@ def my_event():
         search_criteria = {
             "host" : name
         } #找出主辦人有此user的活動
-        event_data = get_user_events(search_criteria)
+        event_data = get_user_events(name, search_criteria)
 
         return render_template("home.html",
                                username = name, 
@@ -60,7 +59,7 @@ def user_ended_event():
         }
         event_data = [
             event
-            for event in get_user_events(search_criteria)
+            for event in get_user_events(name, search_criteria)
             #if current_time > datetime.fromisoformat(event["date_end"])
         ]
         
@@ -83,7 +82,7 @@ def end_event():
         
         event_data = [
             event
-            for event in get_user_events({})
+            for event in get_user_events(name, {})
             #if current_time > datetime.fromisoformat(event["date_end"])
         ]
         
@@ -111,7 +110,7 @@ def joinable_event():
         ]}
         event_data = [
             event
-            for event in get_user_events(search_criteria)
+            for event in get_user_events(name, search_criteria)
             #if current_time <= datetime.fromisoformat(event["date_end"])
         ]
         

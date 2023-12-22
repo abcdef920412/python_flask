@@ -255,7 +255,14 @@
                         const member = {{ url_for("event_manage.member")|tojson }};
                         window.location.href = member;
                     }, 2000); // 2 秒後跳轉頁面
-                } else {
+                } else if(responseData.result === 'UnAuthorized'){
+                    Swal.fire({
+                        icon: 'error',
+                        title: '無此權限',
+                        timer: 2000,
+                        timerProgressBar: true,
+                    });
+                }else {
                     Swal.fire({
                         icon: 'error',
                         title: '發生錯誤',
