@@ -15,46 +15,35 @@
     </div>
     <div class="row">
       <div class="column">
-        <div class="column-1">
-          <label>查看活動</label> 
-          <ul>
-            <li><a href="#">查看已參加活動</a></li><br>
-            <li><a href="#">查看已報名活動</a></li>
-          </ul>
-          <hr>
-          <label>活動管理</label>
-          <ul>
-          <li><a href="{{ url_for('event_manage.create') }}">新增活動</a></li><br>
-          <li><a href="#">刪除活動</a></li>
-          </ul>
-          <hr>
-          <label>帳號管理</label>
-          <ul>
-            <li><a href="{{ url_for('account_manage.getUserdata') }}">帳號管理</a></li>
-            </ul>
+        <div class="column-2">
+          <form id="goBack" action="{{ url_for('event_manage.member') }}">
+            <input type="submit" value = "返回主頁" />
+          </form>
         </div>
-      </div>
+	    </div>
       <div class="column">
         <div class="column-2">
-        <form action="{{ url_for('account_manage.permission_adjust') }}" method="POST">
-          <input type="submit" name = "command" id = "ban" value = "加入黑名單"/>
-          <input type="submit" name = "command" id = "unban" value = "移除黑名單"/>
-          <input type="submit" name = "command" id = "advancilize" value = "設定為進階使用者"/>
-          <input type="submit" name = "command" id = "normalize" value = "設定為一般使用者"/>
-          <!--Form目前先寫在這-->
-          
-        {% for user in users%}
-          <div class="panel panel-primary" style="border: 2px solid blue; background-color : gray; text-align:left;" >
-          <input type = "checkbox" name = "user" value = "{{user[0]}}">
-          使用者名稱：{{user[0]}}<br>
-          等級：{{user[1]}}<br>
-          身分：{{user[2]}}<br>
-          黑名單：{{user[3]}}<br>
-          </div>
-        {% endfor %}
+          <label>功能：</label>
+          <form action="{{ url_for('account_manage.permission_adjust') }}" method="POST">
+            <input type="submit" name = "command" id = "ban" value = "加入黑名單"/>
+            <input type="submit" name = "command" id = "unban" value = "移除黑名單"/>
+            <input type="submit" name = "command" id = "advancilize" value = "設定為進階使用者"/>
+            <input type="submit" name = "command" id = "normalize" value = "設定為一般使用者"/>
+            <!--Form目前先寫在這-->
+          <hr>
+            
+          {% for user in users%}
+            <div class="panel panel-primary" style="border: 2px solid red; background-color : gray; text-align:left;" >
+            <input type = "checkbox" name = "user" value = "{{user[0]}}">
+            使用者名稱：{{user[0]}}<br>
+            等級：{{user[1]}}<br>
+            身分：{{user[2]}}<br>
+            黑名單：{{user[3]}}<br>
+            </div>
+          {% endfor %}
 
 
-        </form>
+          </form>
         </div>
       </div>
       <div class="column">
@@ -72,7 +61,7 @@
           <input type="submit" name = "command" id = "normalize" value = "設定為一般使用者"/>
         </form>-->
         </div>
-	  </div>
+	    </div>
     </div>
   </div>
 </body>
