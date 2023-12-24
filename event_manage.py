@@ -167,6 +167,8 @@ def search_event():
     """可以收進階搜尋"""
     host = request.form.getlist("host_type")
     type = request.form.getlist("event_type")
+    host_all = True if "全部" in host or not host else False
+    type_all = True if "全部" in type or not type else False
 
     filter_value = request.form["filter"]
     # 初始化 search_criteria，設置通用條件
@@ -174,11 +176,11 @@ def search_event():
         "title": {"$regex": event_name},
     }
 
-    if "全部" in host and "全部" in type:
+    if host_all and type_all:
         print("bruh")#do nothing
-    elif "全部" in host:
+    elif host_all:
         search_criteria["tag"] = {"$in":[h for h in (type)]}
-    elif "全部" in type:
+    elif type_all:
         search_criteria["tag"] = {"$in":[h for h in (host)]}
     else:
         search_criteria["tag"] = {"$in":[h for h in (host + type)]}#找所有至少有符合其中一種的活動
