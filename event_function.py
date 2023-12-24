@@ -35,7 +35,7 @@ def find_user_identity(username):
     return user["identity"]
 
 def time_compare(data, mod):
-    now = strftime("%Y-%m-%d  %H:%M", gmtime())
+    now = strftime("%Y-%m-%dT%H:%M", gmtime())
     new_data = []
     for x in data:
         if x["date_end"] > now and mod == 1:#attend_event(started + not start)

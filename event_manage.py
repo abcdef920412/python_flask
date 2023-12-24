@@ -68,6 +68,7 @@ def event(event_id):
 
     event_data = [{
         "title": table["title"],
+        "host": table["host"],
         "date_begin": table["date_begin"],
         "date_end": table["date_end"],
         "location": table["location"],
@@ -163,15 +164,26 @@ def search_event():
     else:
         name = ""
     event_name = request.form["q"]
-    """可以收進階搜尋
-    for wtffff in wtf:
-        print(wtffff)
-    """
+    """可以收進階搜尋"""
+    host = request.form.getlist("host_type")
+    type = request.form.getlist("event_type")
+    host_all = True if "全部" in host or not host else False
+    type_all = True if "全部" in type or not type else False
+
     filter_value = request.form["filter"]
     # 初始化 search_criteria，設置通用條件
     search_criteria = {
-        "title": {"$regex": event_name}
+        "title": {"$regex": event_name},
     }
+
+    if host_all and type_all:
+        print("bruh")#do nothing
+    elif host_all:
+        search_criteria["tag"] = {"$in":[h for h in (type)]}
+    elif type_all:
+        search_criteria["tag"] = {"$in":[h for h in (host)]}
+    else:
+        search_criteria["tag"] = {"$in":[h for h in (host + type)]}#找所有至少有符合其中一種的活動
 
     # 根據不同的 filter 值修改 search_criteria
     if filter_value == "attend" or filter_value == "myend":
