@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, session
-from event_function import get_user_events, find_user_level, find_user_identity, time_compare
+from event_function import get_user_events, find_user_level, find_user_identity
+from datetime import datetime
 
 #from datetime import datetime
 
@@ -9,7 +10,7 @@ event_list_bp = Blueprint('event_list', __name__)
 def attend_event():
     if "username" in session:
         # 獲取當前主機時間
-        #current_time = datetime.now()
+        current_time = datetime.now()
         name = session["username"]
         level = find_user_level(name)
         search_criteria = {
@@ -18,9 +19,9 @@ def attend_event():
         event_data = [
             event
             for event in get_user_events(name, search_criteria)
-            #if current_time <= datetime.fromisoformat(event["date_end"])
+            if current_time <= datetime.fromisoformat(event["date_end"])
         ]
-        event_data = time_compare(event_data, 1)#mod = 1
+        #event_data = time_compare(event_data, 1)#mod = 1
         
         return render_template("home.html",
                                username = name, 
@@ -50,7 +51,7 @@ def my_event():
 def user_ended_event():
     if "username" in session:
         # 獲取當前主機時間
-        #current_time = datetime.now()
+        current_time = datetime.now()
         #print(current_time)
         name = session["username"]
         level = find_user_level(name)
@@ -60,10 +61,10 @@ def user_ended_event():
         event_data = [
             event
             for event in get_user_events(name, search_criteria)
-            #if current_time > datetime.fromisoformat(event["date_end"])
+            if current_time > datetime.fromisoformat(event["date_end"])
         ]
-        
-        event_data = time_compare(event_data, 2)#mod = 2
+
+        #event_data = time_compare(event_data, 2)#mod = 2
 
         return render_template("home.html",
                                username = name, 
@@ -76,17 +77,17 @@ def user_ended_event():
 def end_event():
     if "username" in session:
         # 獲取當前主機時間
-        #current_time = datetime.now()
+        current_time = datetime.now()
         name = session["username"]
         level = find_user_level(name)
         
         event_data = [
             event
             for event in get_user_events(name, {})
-            #if current_time > datetime.fromisoformat(event["date_end"])
+            if current_time > datetime.fromisoformat(event["date_end"])
         ]
         
-        event_data = time_compare(event_data, 2)#mod = 2
+        #event_data = time_compare(event_data, 2)#mod = 2
 
         return render_template("home.html",
                                username = name, 
@@ -99,7 +100,7 @@ def end_event():
 def joinable_event():
     if "username" in session:
         # 獲取當前主機時間
-        #current_time = datetime.now()
+        current_time = datetime.now()
         name = session["username"]
         level = find_user_level(name)
         identity = find_user_identity(name)
@@ -111,10 +112,10 @@ def joinable_event():
         event_data = [
             event
             for event in get_user_events(name, search_criteria)
-            #if current_time <= datetime.fromisoformat(event["date_end"])
+            if current_time <= datetime.fromisoformat(event["date_end"])
         ]
         
-        event_data = time_compare(event_data, 1)#mod = 1
+        #event_data = time_compare(event_data, 1)#mod = 1
         
         return render_template("home.html",
                                username = name, 
