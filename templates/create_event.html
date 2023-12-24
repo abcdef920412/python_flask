@@ -259,9 +259,14 @@
                     Swal.fire({
                         icon: 'error',
                         title: '無此權限',
+                        text: '2 秒後跳轉頁面',
                         timer: 2000,
                         timerProgressBar: true,
                     });
+                    setTimeout(() => {
+                        const member = {{ url_for("sign.index")|tojson }};
+                        window.location.href = member;
+                    }, 2000); // 2 秒後跳轉頁面
                 }else {
                     Swal.fire({
                         icon: 'error',

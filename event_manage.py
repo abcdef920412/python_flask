@@ -59,7 +59,7 @@ def event(event_id):
         )
         #只有系統管理員或該活動主辦人可調閱 member 資料
         level = user["level"]
-        if level in ["advanced", "admin"] or name == table["host"]: 
+        if level == "admin" or name == table["host"]:
             member = table["member"]
     else:
         name = "Guest"
@@ -230,13 +230,14 @@ def search_event():
 @event_manage_bp.route("/delete_event/<event_id>")
 def delete_event(event_id):
     if "username" in session:
-        if find_user_level(session["username"]) not in ["advanced", "admin"]:
+        level = find_user_level(session["username"])
+        if level not in ["advanced", "admin"]:
             return redirect(url_for('sign.index'))
         collection = db["events"]
         filter = {"_id" : ObjectId(event_id)}
         target = collection.find_one(filter)
         if target != None:
-            if target["host"] != session["username"]:
+            if target["host"] != session["username"] and level != "admin":
                 return {'result' : 'UnAuthorized'}
             collection.delete_one(filter)
             return {'result' : 'Success'}
