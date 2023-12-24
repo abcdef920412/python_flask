@@ -7,6 +7,11 @@ sign_bp = Blueprint('sign', __name__)
 def index():
     return render_template("signin.html")
 
+@sign_bp.route("/error")
+def err():
+    message=request.args.get("msg" , "發生錯誤")
+    return render_template("error.html", message=message)
+
 @sign_bp.route("/sign")
 def sign():
    return render_template("signup.html")
@@ -21,13 +26,13 @@ def signup():
     identity=request.form["identity"]
     #資料庫互動
     if comfirm_password != password :
-       return redirect("/error?msg=確認密碼與密碼不符")
+       return redirect(url_for('sign.err'))
     collection = db["users"]
     result = collection.find_one({ 
         "username": username
     })
     if result != None:
-        return redirect("/error?msg=帳號已被註冊過，請嘗試別的帳號")
+        return redirect(url_for('sign.err'))
     collection.insert_one({
         "fullname":fullname,
         "username": username,
@@ -52,7 +57,7 @@ def signin():
         ]
     })
     if result == None:
-        return redirect("/error?msg=帳號密碼輸入錯誤或是你被ban了")
+        return redirect(url_for('sign.err'))
     session["username"] = result["username"]
     #print(session)
     return redirect(url_for('event_manage.member'))
