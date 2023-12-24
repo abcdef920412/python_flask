@@ -59,7 +59,7 @@ def event(event_id):
         )
         #只有系統管理員或該活動主辦人可調閱 member 資料
         level = user["level"]
-        if level == "advanced" or name == table["host"]: 
+        if level in ["advanced", "admin"] or name == table["host"]: 
             member = table["member"]
     else:
         name = "Guest"
@@ -68,7 +68,6 @@ def event(event_id):
 
     event_data = [{
         "title": table["title"],
-        "host": table["host"],
         "date_begin": table["date_begin"],
         "date_end": table["date_end"],
         "location": table["location"],
@@ -170,7 +169,7 @@ def search_event():
     host_all = True if "全部" in host or not host else False
     type_all = True if "全部" in type or not type else False
 
-    filter_value = request.form["filter"]
+    filter_value = request.form["filter"]    
     # 初始化 search_criteria，設置通用條件
     search_criteria = {
         "title": {"$regex": event_name},
