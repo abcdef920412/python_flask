@@ -32,16 +32,21 @@
             <!--Form目前先寫在這-->
           <hr>
             
-          {% for user in users%}
-            <div class="panel panel-primary" style="border: 2px solid red; background-color : gray; text-align:left;" >
-            <input type = "checkbox" name = "user" value = "{{user[0]}}">
-            使用者名稱：{{user[0]}}<br>
-            等級：{{user[1]}}<br>
-            身分：{{user[2]}}<br>
-            黑名單：{{user[3]}}<br>
-            </div>
-          {% endfor %}
-
+          <div style="height: 700px; overflow-y: auto;">
+            <ul>
+              {% for user in users %}
+                <li class="panel panel-primary" style="border: 2px solid red; background-color: white; text-align: left;">
+                  <div>
+                    <input type="checkbox" name="user" value="{{ user[0] }}">
+                    使用者名稱：{{ user[0] }}<br>
+                    等級：{{ user[1] }}<br>
+                    身分：{{ user[2] }}<br>
+                    黑名單：{{ user[3] }}<br>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>          
 
           </form>
         </div>

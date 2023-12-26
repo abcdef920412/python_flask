@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="{{ url_for('static', filename='event.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
@@ -16,6 +17,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
     <style>
         .container{
             width:35em;
@@ -29,50 +31,48 @@
             padding-right: 40px;
             padding-bottom: 70px;
         }
-        h2{
+        svg{
+            float: left;
+            border-radius: 100%;
+        }
+        svg:hover{
+            background-color: rgb(218, 216, 216);
+        }
+        h4{
             border-color: black;
             text-align: center;
             justify-content: center;
-            
-        }
-        #registration{
-            float: right;
-            width: 80px;
+            margin-bottom: 25px;
+        }        
+        .container button{
+            height: 40px;
             background-color: #3492df;
             border: none;
         }
-        #deletion {
-            float: right;
-            width: 80px;
-            background-color: #3492df;
-            border: none;
-            margin-right: 15px;
+        .bottongroup{
+            float:right;
         }
-        #viewDetails{
-            float: left;
-            width: 120px;
-            background-color: #3492df;
-            border: none;
+        #registration,#deletion{
+            width: 70px;
         }
         pre {
             white-space: pre-line;
-        }
-        </style>
+        } /*保留換行符號*/
     </style>
-    
+
     <div class="container">
         <div class="section1">
-            <a href="#" class="btn btn-primary" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i>
+            <a href="#" onclick="goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16" color="black">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+                </svg>
             </a>
             {% for event in events %}
-            <h2>查看活動</h2>
-            <h5 id="title" class="form-label">活動標題:</h5>
-            <p>{{event["title"]}}</p>
+            <h4>{{event["title"]}}</h4>
             <h5 id="date_begin" class="form-label">活動開始日期:</h5>
-            <p><pre>{{event["date_begin"].replace("T","   ")}}</pre></p>
+            <p>{{event["date_begin"].replace("T","   ")}}</p>
             <h5 id="date_end" class="form-label">活動結束日期:</h5>
-            <p><pre>{{event["date_end"].replace("T","   ")}}</pre></p>
+            <p>{{event["date_end"].replace("T","  ")}}</p>
             <h5 id="event_location" class="form-label">活動地點:</h5>
             <p>{{event["location"]}}</p>
             <h5 id="event_description" class="form-label" >活動介紹:</h5>
@@ -81,10 +81,31 @@
             <p>{{event["limit_value"]}}</p>
             <h5 id="event_description" class="form-label" >尚餘名額:</h5>
             <p>{{event["limit_value"] - event["registered_count"]}}</p>
+            <div class="modal fade" id="viewUsers" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="ModalLabel">報名成員</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        {% if members%}
+                            {% for member in members %}
+                                <p>{{member}}</p>
+                            {% endfor %}
+                        {% else %}
+                        <p>尚無報名成員</p>
+                        {% endif %}
+                      </div>
+                    </div>
+                </div>
+            </div>
             {% endfor %}
-            <button id="registration" class="btn btn-primary">報名</button>
-            <button id="deletion" class="btn btn-primary">刪除</button>
-            <button id="viewDetails" class="btn btn-primary">參加人員</button>
+            <div class="bottongroup">
+                <button id="viewDetails" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#viewUsers" >檢視使用者</button>
+                <button id="deletion" class="btn btn-primary" >刪除</button>
+                <button id="registration" class="btn btn-primary">報名</button>
+            </div>
         </div>
     </div>
         
@@ -114,22 +135,6 @@
             // 使用 history 返回上一頁
             window.history.back();
         }
-
-        document.getElementById('viewDetails').addEventListener('click', function () {
-            Swal.fire({
-                icon: 'info',
-                title: '活動報名人員',
-                html: `
-                {% if members%}
-                    {% for member in members %}
-                        <p>{{member}}</p>
-                    {% endfor %}
-                {% else %}
-                    <p>尚無報名成員</p>
-                {% endif %}
-                `
-            });
-        });
         
         var registrationButton = document.getElementById('registration');
         registrationButton.addEventListener('click', function () {  
@@ -245,4 +250,3 @@
     </script>
 </body>
 </html>
-
