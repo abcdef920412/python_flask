@@ -94,7 +94,7 @@ def register_event(event_id):
         event = collection.find_one(filter)
         if datetime.now() > datetime.fromisoformat(event["date_end"]):
             return {'result' : 'registrationClosed'}
-        if event["requirement"] not in [find_user_identity(username), "all"]:
+        if event["requirement"] not in [find_user_identity(username), "all"] and find_user_level(username)!="admin":
             return {'result' : 'invalid_identity'}
         if username not in event["member"]:
             limit = event["limit_value"]

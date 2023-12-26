@@ -104,11 +104,16 @@ def joinable_event():
         name = session["username"]
         level = find_user_level(name)
         identity = find_user_identity(name)
-        search_criteria = { #未報名且符合資格
-        "$and": [
-            {"member": {"$nin": [name]}},
-            {"requirement": {"$in": [identity, "all"]}}
-        ]}
+        if level!="admin" :
+            search_criteria = { #未報名且符合資格
+            "$and": [
+                {"member": {"$nin": [name]}},
+                {"requirement": {"$in": [identity, "all"]}}
+            ]}
+        else:
+            search_criteria = { #未報名且符合資格
+                "member": {"$nin": [name]}
+            }    
         event_data = [
             event
             for event in get_user_events(name, search_criteria)
